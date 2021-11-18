@@ -62,3 +62,19 @@ Project Organization
     └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
 
 --------
+
+
+
+## Setup
+
+
+```python
+python -m pip install poetry
+# or 
+pipx install poetry
+
+## Verify
+poetry --version
+
+```
+
