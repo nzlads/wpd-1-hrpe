@@ -6,9 +6,12 @@ authors = ["ari-nz <hello@ari.nz>"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
+requests = "^2.26.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
+pylint = "^2.11.1"
+autopep8 = "^1.6.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
