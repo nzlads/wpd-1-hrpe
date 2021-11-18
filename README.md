@@ -19,56 +19,10 @@ issues may become increasingly common, especially on the lower voltages of the n
 lower carbon technologies such as electric vehicles, and heat pumps. However, monitoring can be expensive (especially in
 the long term) as it requires investment in additional storage, communications equipment and processing units.
 
-Project Organization
-------------
-
-    ├── Makefile           <- Makefile with commands like `make data` or `make train`
-    ├── README.md          <- The top-level README for developers using this project.
-    ├── data
-    │   ├── external       <- Data from third party sources.
-    │   ├── interim        <- Intermediate data that has been transformed.
-    │   ├── processed      <- The final, canonical data sets for modeling.
-    │   └── raw            <- The original, immutable data dump.
-    │
-    ├── explorations       <- Jupyter notebooks. Naming convention is a number (for ordering),
-    │                      the creator's initials, and a short `-` delimited description, e.g.
-    │                      `1.0-jqp-initial-data-exploration`.
-    │
-    ├── models             <- Trained and serialized models, model predictions, or model summaries
-    │
-    ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
-    │
-    ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-    │                         generated with `pip freeze > requirements.txt`
-    │
-    ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
-    ├── src                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
-    │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   └── make_dataset.py
-    │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
-    │   │
-    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
-    │
-    └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
-
---------
-
-
-
 ## Setup
 
 
-```python
+```sh
 python -m pip install poetry
 # or 
 pipx install poetry
@@ -76,5 +30,17 @@ pipx install poetry
 ## Verify
 poetry --version
 
+# virtual env
+python -m venv venv
+venv\Scripts\activate
+
+poetry install
 ```
 
+### Poetry Commands
+
+https://hackersandslackers.com/python-poetry-package-manager/
+
+
+### Weather data
+ https://codalab.lisn.upsaclay.fr/competitions/213#participate-get_starting_kit
