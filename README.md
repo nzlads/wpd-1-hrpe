@@ -21,8 +21,10 @@ the long term) as it requires investment in additional storage, communications e
 
 ## Setup
 
-
 ```sh
+# Poetry's preferred install method on windows via powershell
+(Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py -UseBasicParsing).Content | python -
+# Otherwise manual install with
 python -m pip install poetry
 # or 
 pipx install poetry
@@ -43,4 +45,5 @@ https://hackersandslackers.com/python-poetry-package-manager/
 
 
 ### Weather data
+
  https://codalab.lisn.upsaclay.fr/competitions/213#participate-get_starting_kit
