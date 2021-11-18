@@ -12,8 +12,10 @@ def download(verbose=True):
     """
     DATA_PACKAGE_JSON = "https://connecteddata.westernpower.co.uk/dataset/western-power-distribution-data-challenge-1-high-resolution-peak-estimation/datapackage.json"
     response = requests.get(DATA_PACKAGE_JSON)
-    resource_urls = {r["name"].replace(" ", "_").lower(): r["url"] for r in response.json()[
-        "resources"] if r["url_type"] == "upload"}
+    resource_urls = {r["name"].replace(" ", "_").lower(): r["url"] for r in response.json()["resources"] if r["url_type"] == "upload"}
+
+    if verbose:
+        print(f"Found {len(resource_urls)} resources to download")
 
     for name, url in resource_urls.items():
         if verbose:
