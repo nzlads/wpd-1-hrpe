@@ -46,4 +46,4 @@ https://hackersandslackers.com/python-poetry-package-manager/
 
 ### Weather data
 
- https://codalab.lisn.upsaclay.fr/competitions/213#participate-get_starting_kit
+https://codalab.lisn.upsaclay.fr/competitions/213#participate-get_starting_kit
