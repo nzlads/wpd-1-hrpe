@@ -49,4 +49,6 @@ plt.show()
 # as value_mean increases (i.e. 30min avg demand increases) the delta_max decreases; 
 # but is more variable at lower value_mean?
 sns.relplot(data=hh_data, x="value_mean", y="delta_max", col="period", col_wrap=8)
+sns.relplot(data=hh_data, x="value_mean", y="delta_max")
+sns.relplot(data=hh_data, x="value_mean", y="delta_min")
 plt.show()
