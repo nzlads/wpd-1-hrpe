@@ -75,6 +75,7 @@ def load_weather(substation, time_start=None, time_end=None):
 
 
 def load_hh_data(substation, time_start=None, time_end=None):
+
     """
     Loads the half hourly data for a given substation
     :param substation: the name of the substation
@@ -147,6 +148,7 @@ def load_maxmin_data(substation, time_start=None, time_end=None):
     for fil in files:
         if "max_min" in fil:
             filepath = fil
+
 
     # Read data
     data = pd.read_csv(filepath, parse_dates=[1])
