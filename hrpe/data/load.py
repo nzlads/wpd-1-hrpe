@@ -7,6 +7,10 @@ import glob
 import pandas as pd
 
 
+def load_hh_data(substation, time_start = None, time_end = nNone )
+
+
+
 def load_minute_data(substation):
     """
     Loads the minute data for a given substation
