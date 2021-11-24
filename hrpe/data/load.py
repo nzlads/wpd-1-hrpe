@@ -7,6 +7,7 @@ import pandas as pd
 import datetime
 import re
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> Load complete
@@ -19,6 +20,8 @@ def validate_date(date_text: str):
     :returns: A python datetime object 
     :raises keyError: identifies if it doesn't match the format - raises error
     """
+=======
+>>>>>>> Load complete
 
     try:
         datetime.datetime.strptime(date_text, '%Y-%m-%d')
@@ -78,7 +81,11 @@ def load_weather(substation, time_start=None, time_end=None):
 
 
 def load_hh_data(substation, time_start=None, time_end=None):
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> Load complete
     """
     Loads the half hourly data for a given substation
     :param substation: the name of the substation
@@ -102,6 +109,12 @@ def load_hh_data(substation, time_start=None, time_end=None):
             filepath.append(fil)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> Load complete
 =======
 
 
@@ -117,9 +130,13 @@ def load_hh_data(substation, time_start=None, time_end=None):
             file_type = file_type.group(1)
 
         # Read data, add type column
+<<<<<<< HEAD
 
         pddata = pd.read_csv(fl, parse_dates=[0])
 
+=======
+        pddata = pd.read_csv(fl, parse_dates=[1])
+>>>>>>> Load complete
         pddata['type'] = file_type
         data_list.append(pddata)
 
