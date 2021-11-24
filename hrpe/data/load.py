@@ -8,12 +8,15 @@ import pandas as pd
 
 
 def load_weather(substation, time_start=None, time_end=None):
+    pass
 
 
 def load_hh_data(substation, time_start=None, time_end=None):
+    pass
 
 
 def load_maxmin_data(substation, time_start=None, time_end=None):
+    pass
 
 
 def load_minute_data(substation):
