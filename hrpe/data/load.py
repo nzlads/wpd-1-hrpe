@@ -1,7 +1,6 @@
 """
 Functions to help load raw data to work with
 """
-
 import os
 import glob
 import pandas as pd
@@ -22,6 +21,26 @@ def check_substation(substation):
     if (substation not in valid_stations):
         raise Exception(f"substation not in valid list: {valid_stations}")
     return substation
+
+
+def time_check(time_start, time_end):
+    if(time_start is not None):
+        time_start = validate_date(time_start)
+
+    if(time_end is not None):
+        time_end = validate_date(time_end)
+
+    return time_start, time_end
+
+
+def filter_data_by_time(data, time_start, time_end):
+    if(time_start is not None):
+        data = data[data['time'] >= time_start]
+
+    if(time_end is not None):
+        data = data[data['time'] < time_end]
+
+    return data
 
 
 def load_weather(substation, time_start=None, time_end=None):
@@ -66,11 +85,7 @@ def load_minute_data(substation, time_start=None, time_end=None):
     check_substation(substation)
 
     # Get times
-    if(time_start is not None):
-        time_start = validate_date(time_start)
-
-    if(time_end is not None):
-        time_end = validate_date(time_end)
+    time_start, time_end = time_check(time_start, time_end)
 
     # File path - find minute data
     file_dir = os.path.join("data", "raw", substation)
@@ -94,10 +109,6 @@ def load_minute_data(substation, time_start=None, time_end=None):
         raise Exception(f"Column names do not match\nGot: {data.columns},\n expected: {expected_cols}")
 
     # Filter by time
-    if(time_start is not None):
-        data = data[data['time'] >= time_start]
-
-    if(time_end is not None):
-        data = data[data['time'] < time_end]
+    data = filter_data_by_time(data, time_start, time_end)
 
     return data

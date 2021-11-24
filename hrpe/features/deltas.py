@@ -5,8 +5,9 @@ def calculate_deltas(data):
   """
    Half hourly data, works out delta max, delta min and full range
    Add as column
-   return data
+    return data
   """
+  
 
 
 def calculate_maxmin(data):
