@@ -23,6 +23,7 @@ def calculate_deltas(data):
     return hh_data
 
 
+
 def calculate_deltas(data):
   """
    Half hourly data, works out delta max, delta min and full range
@@ -33,6 +34,7 @@ def calculate_deltas(data):
 
 
  	hh_data["is_weekday"] = hh_data["is_weekday"].astype(int)
+
 
 def calculate_maxmin(data):
     """
