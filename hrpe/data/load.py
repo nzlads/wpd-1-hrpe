@@ -127,6 +127,7 @@ def load_hh_data(substation, time_start=None, time_end=None):
 
 
 def load_maxmin_data(substation, time_start=None, time_end=None):
+    pass
 
     """
     Loads the maxmin data for a given substation
