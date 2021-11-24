@@ -7,7 +7,16 @@ import pandas as pd
 import datetime
 import re
 
-def validate_date(date_text):
+
+def validate_date(date_text: str):
+    """
+    Check a date, convert to a datetime object
+
+    :param date_text: A string of the form YYYY-MM-DD
+    :returns: A python datetime object 
+    :raises keyError: identifies if it doesn't match the format - raises error
+    """
+
     try:
         datetime.datetime.strptime(date_text, '%Y-%m-%d')
         return datetime.datetime.strptime(date_text, '%Y-%m-%d')
@@ -15,7 +24,14 @@ def validate_date(date_text):
         raise ValueError("Incorrect data format, should be YYYY-MM-DD")
 
 
-def check_substation(substation):
+def check_substation(substation: str):
+    """
+    Check a date, convert to a datetime object
+
+    :param substation: A string in the following list ['staplegrove', 'geevor', 'mousehole']
+    :returns: substation 
+    :raises keyError: identifies if it doesn't match the list
+    """
     substation = substation.lower()
     valid_stations = ['staplegrove', 'geevor', 'mousehole']
     if (substation not in valid_stations):
@@ -24,6 +40,16 @@ def check_substation(substation):
 
 
 def time_check(time_start, time_end):
+    """Helper function over the validation of time_start and time_end
+
+    Args:
+        time_start ([str]): [start time to filter by]
+        time_end ([str]): [end time to filter by]
+
+    Returns:
+        [list(dt, dt)]: [packed list of start and end times]
+    """  
+
     if(time_start is not None):
         time_start = validate_date(time_start)
 
@@ -41,6 +67,13 @@ def filter_data_by_time(data, time_start, time_end):
         data = data[data['time'] < time_end]
 
     return data
+
+
+
+
+
+
+
 
 
 def load_weather(substation, time_start=None, time_end=None):
