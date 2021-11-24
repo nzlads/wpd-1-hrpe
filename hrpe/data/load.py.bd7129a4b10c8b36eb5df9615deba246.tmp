@@ -6,25 +6,7 @@ import glob
 import pandas as pd
 import datetime
 import re
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
->>>>>>> Load complete
-
-def validate_date(date_text: str):
-    """
-    Check a date, convert to a datetime object
-
-    :param date_text: A string of the form YYYY-MM-DD
-    :returns: A python datetime object 
-    :raises keyError: identifies if it doesn't match the format - raises error
-    """
-=======
->>>>>>> Load complete
-
-<<<<<<< HEAD
-=======
 
 def validate_date(date_text: str):
     """
@@ -35,7 +17,6 @@ def validate_date(date_text: str):
     :raises keyError: identifies if it doesn't match the format - raises error
     """
 
->>>>>>> Add docstrings
     try:
         datetime.datetime.strptime(date_text, '%Y-%m-%d')
         return datetime.datetime.strptime(date_text, '%Y-%m-%d')
@@ -45,11 +26,7 @@ def validate_date(date_text: str):
 
 def check_substation(substation: str):
     """
-<<<<<<< HEAD
     Check a substation belongs to valid substations
-=======
-    Check a date, convert to a datetime object
->>>>>>> Add docstrings
 
     :param substation: A string in the following list ['staplegrove', 'geevor', 'mousehole']
     :returns: substation 
@@ -72,11 +49,7 @@ def time_check(time_start, time_end):
 
     Returns:
         [list(dt, dt)]: [packed list of start and end times]
-<<<<<<< HEAD
     """
-=======
-    """  
->>>>>>> Add docstrings
 
     if(time_start is not None):
         time_start = validate_date(time_start)
@@ -97,23 +70,12 @@ def filter_data_by_time(data, time_start, time_end):
     return data
 
 
-
-
-
-
-
-
-
 def load_weather(substation, time_start=None, time_end=None):
     pass
 
 
 def load_hh_data(substation, time_start=None, time_end=None):
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> Load complete
     """
     Loads the half hourly data for a given substation
     :param substation: the name of the substation
@@ -137,12 +99,6 @@ def load_hh_data(substation, time_start=None, time_end=None):
             filepath.append(fil)
 
 <<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
-
-
->>>>>>> Load complete
 =======
 
 
@@ -158,13 +114,9 @@ def load_hh_data(substation, time_start=None, time_end=None):
             file_type = file_type.group(1)
 
         # Read data, add type column
-<<<<<<< HEAD
 
         pddata = pd.read_csv(fl, parse_dates=[0])
 
-=======
-        pddata = pd.read_csv(fl, parse_dates=[1])
->>>>>>> Load complete
         pddata['type'] = file_type
         data_list.append(pddata)
 
