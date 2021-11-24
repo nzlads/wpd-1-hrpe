@@ -26,8 +26,8 @@ forecast = load_hh_data("staplegrove", time_start="2021-07-01", time_end="2021-0
 forecast = forecast[["time", "value"]]
 forecast.columns = ["time", "value_mean"]
 
-mod = SnaivePeriodModel()
-mod.fit(hh_data, seasonalities={"years": 1})
+mod = SnaivePeriodModel(seasonalities={"years": 1})
+mod.fit(hh_data)
 preds = mod.predict(forecast)
 
 truths = load_maxmin_data("staplegrove", time_start="2021-07-01", time_end="2021-08-01")

@@ -6,13 +6,17 @@ class SnaivePeriodModel(PeriodModel):
     """
     A basic naive model that fits model per period
     """
-    def fit(self, train: pd.DataFrame, seasonalities: dict):
+    def __init__(self, seasonalities: dict):
+        allowed_keys = ["years"]
+        assert all([k in allowed_keys for k in seasonalities.keys()]), f"Allowed keys are {allowed_keys}"
+        self.seasonalities = seasonalities
+
+    def fit(self, train: pd.DataFrame):
         """
         Define some expectations for what to expect in the data frames
         """
         self.check_train_data(train)
         self.delta_data = train[["time", "delta_max", "delta_min"]]
-        self.seasonalities = seasonalities
     
     def predict(self, forecast: pd.DataFrame):
         """
