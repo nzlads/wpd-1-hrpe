@@ -8,6 +8,7 @@ import datetime
 import re
 
 
+
 def validate_date(date_text: str):
     """
     Check a date, convert to a datetime object
@@ -16,7 +17,6 @@ def validate_date(date_text: str):
     :returns: A python datetime object 
     :raises keyError: identifies if it doesn't match the format - raises error
     """
-
     try:
         datetime.datetime.strptime(date_text, '%Y-%m-%d')
         return datetime.datetime.strptime(date_text, '%Y-%m-%d')
@@ -26,7 +26,7 @@ def validate_date(date_text: str):
 
 def check_substation(substation: str):
     """
-    Check a substation belongs to valid substations
+    Check a substation belongs to valid substations list
 
     :param substation: A string in the following list ['staplegrove', 'geevor', 'mousehole']
     :returns: substation 
@@ -70,6 +70,13 @@ def filter_data_by_time(data, time_start, time_end):
     return data
 
 
+
+
+
+
+
+
+
 def load_weather(substation, time_start=None, time_end=None):
     pass
 
@@ -80,6 +87,7 @@ def load_hh_data(substation, time_start=None, time_end=None):
     Loads the half hourly data for a given substation
     :param substation: the name of the substation
     """
+
 
     # whatever
     check_substation(substation)
@@ -98,6 +106,7 @@ def load_hh_data(substation, time_start=None, time_end=None):
         if "half_hourly_real_power" in fil:
             filepath.append(fil)
 
+
     data_list = list()
     for fl in filepath:
         # Get date in path
@@ -114,6 +123,7 @@ def load_hh_data(substation, time_start=None, time_end=None):
 
     data = pd.concat(data_list)
 
+
     # Assert cols
     expected_cols = ['time', 'value', 'type']
     col_names_match = data.columns == expected_cols
@@ -125,7 +135,7 @@ def load_hh_data(substation, time_start=None, time_end=None):
     data = filter_data_by_time(data, time_start, time_end)
 
     return data
-
+  
 
 def load_maxmin_data(substation, time_start=None, time_end=None):
     """
@@ -149,7 +159,6 @@ def load_maxmin_data(substation, time_start=None, time_end=None):
         if "max_min" in fil:
             filepath = fil
 
-
     # Read data
     data = pd.read_csv(filepath, parse_dates=[0])
 
@@ -165,11 +174,6 @@ def load_maxmin_data(substation, time_start=None, time_end=None):
 
     return data
 
-    return data
-
-    for fil in files:
-        if "minute" in fil:
-            filepath = fil
 
 def load_minute_data(substation, time_start=None, time_end=None):
     """
