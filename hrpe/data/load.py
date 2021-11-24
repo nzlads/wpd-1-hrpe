@@ -8,6 +8,9 @@ import datetime
 import re
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ea3dcd4c9eaff08f8ea4ea59ebd24ba348584066
 
 =======
 >>>>>>> Load complete
@@ -20,6 +23,7 @@ def validate_date(date_text: str):
     :returns: A python datetime object 
     :raises keyError: identifies if it doesn't match the format - raises error
     """
+<<<<<<< HEAD
 =======
 >>>>>>> Load complete
 
@@ -36,6 +40,9 @@ def validate_date(date_text: str):
     """
 
 >>>>>>> Add docstrings
+=======
+
+>>>>>>> ea3dcd4c9eaff08f8ea4ea59ebd24ba348584066
     try:
         datetime.datetime.strptime(date_text, '%Y-%m-%d')
         return datetime.datetime.strptime(date_text, '%Y-%m-%d')
@@ -46,10 +53,14 @@ def validate_date(date_text: str):
 def check_substation(substation: str):
     """
 <<<<<<< HEAD
+<<<<<<< HEAD
     Check a substation belongs to valid substations
 =======
     Check a date, convert to a datetime object
 >>>>>>> Add docstrings
+=======
+    Check a substation belongs to valid substations
+>>>>>>> ea3dcd4c9eaff08f8ea4ea59ebd24ba348584066
 
     :param substation: A string in the following list ['staplegrove', 'geevor', 'mousehole']
     :returns: substation 
@@ -73,10 +84,14 @@ def time_check(time_start, time_end):
     Returns:
         [list(dt, dt)]: [packed list of start and end times]
 <<<<<<< HEAD
+<<<<<<< HEAD
     """
 =======
     """  
 >>>>>>> Add docstrings
+=======
+    """
+>>>>>>> ea3dcd4c9eaff08f8ea4ea59ebd24ba348584066
 
     if(time_start is not None):
         time_start = validate_date(time_start)
@@ -110,14 +125,18 @@ def load_weather(substation, time_start=None, time_end=None):
 
 def load_hh_data(substation, time_start=None, time_end=None):
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
     
 >>>>>>> Load complete
+=======
+>>>>>>> ea3dcd4c9eaff08f8ea4ea59ebd24ba348584066
     """
     Loads the half hourly data for a given substation
     :param substation: the name of the substation
     """
+<<<<<<< HEAD
 
     # whatever
     check_substation(substation)
@@ -182,11 +201,61 @@ def load_hh_data(substation, time_start=None, time_end=None):
     data = filter_data_by_time(data, time_start, time_end)
 
     return data
+=======
+>>>>>>> ea3dcd4c9eaff08f8ea4ea59ebd24ba348584066
+
+    # whatever
+    check_substation(substation)
+
+<<<<<<< HEAD
+def load_maxmin_data(substation, time_start=None, time_end=None):
+    pass
+=======
+    # Get times
+    time_start, time_end = time_check(time_start, time_end)
+>>>>>>> ea3dcd4c9eaff08f8ea4ea59ebd24ba348584066
+
+    # File path - find minute data
+    file_dir = os.path.join("data", "raw", substation)
+    if not os.path.exists(file_dir):
+        raise Exception("The requested substation does not exist")
+    files = glob.glob(rf"{file_dir}/*.csv")
+
+    filepath = list()
+    for fil in files:
+        if "half_hourly_real_power" in fil:
+            filepath.append(fil)
+
+    data_list = list()
+    for fl in filepath:
+        # Get date in path
+        file_type = re.search('power_MW_(.+?).csv', fl)
+        if file_type is None:
+            file_type = 'all'
+        else:
+            file_type = file_type.group(1)
+
+        # Read data, add type column
+        pddata = pd.read_csv(fl, parse_dates=[1])
+        pddata['type'] = file_type
+        data_list.append(pddata)
+
+    data = pd.concat(data_list)
+
+    # Assert cols
+    expected_cols = ['time', 'value', 'type']
+    col_names_match = data.columns == expected_cols
+
+    if(not all(col_names_match)):
+        raise Exception(f"Column names do not match\nGot: {data.columns},\n expected: {expected_cols}")
+
+    # Filter by time
+    data = filter_data_by_time(data, time_start, time_end)
+
+    return data
 
 
 def load_maxmin_data(substation, time_start=None, time_end=None):
-    pass
-
     """
     Loads the maxmin data for a given substation
     :param substation: the name of the substation
@@ -223,9 +292,12 @@ def load_maxmin_data(substation, time_start=None, time_end=None):
 
     return data
 
+<<<<<<< HEAD
     for fil in files:
         if "minute" in fil:
             filepath = fil
+=======
+>>>>>>> ea3dcd4c9eaff08f8ea4ea59ebd24ba348584066
 
 def load_minute_data(substation, time_start=None, time_end=None):
     """
