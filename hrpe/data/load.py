@@ -7,7 +7,6 @@ import pandas as pd
 import datetime
 import re
 
-
 def validate_date(date_text: str):
     """
     Check a date, convert to a datetime object
