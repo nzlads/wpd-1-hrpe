@@ -1,20 +1,15 @@
-
 import seaborn as sns
 import matplotlib.pyplot as plt
 
 from hrpe.data.load import load_minute_data
 from hrpe.features.time import make_datetime_features
 
-
 data = load_minute_data("staplegrove")
 data = make_datetime_features(data)
 
-
 # First exploration: how many periods have bad data points?
-badpp = data.groupby("period_time").agg(
-    {'quality': lambda x: x.isin(["Bad", "Bad Ip"]).sum()})
-print(
-    f"There are {sum(badpp.quality > 0)} periods with bad data out of {len(badpp)}")
+badpp = data.groupby("period_time").agg({'quality': lambda x: x.isin(["Bad", "Bad Ip"]).sum()})
+print(f"There are {sum(badpp.quality > 0)} periods with bad data out of {len(badpp)}")
 print(f"There are {sum(badpp.quality == 30)} periods that are entirely bad")
 # 94 of 30672 periods have some bad data, is 0.3%
 # 51 periods have entirely bad data data (all 30 mins are bad)
@@ -58,3 +53,14 @@ sns.relplot(data=hh_data, x="value_mean", y="delta_min")
 plt.show()
 
 # %%
+# Test eval function
+preds = hh_data[["time", "value_max", "value_min", "value_mean"]]
+truths = preds.copy()
+
+bench = preds[["time", "value_mean"]]
+bench["value_max"] = preds["value_mean"]
+bench["value_min"] = preds["value_mean"]
+
+from hrpe.models.eval import score_model
+score_model(preds, truths) # should be 0
+score_model(bench, truths) # should be 1

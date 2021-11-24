@@ -44,12 +44,15 @@ def filter_data_by_time(data, time_start, time_end):
 
 
 def load_weather(substation, time_start=None, time_end=None):
+    pass
 
 
 def load_hh_data(substation, time_start=None, time_end=None):
+    pass
 
 
 def load_maxmin_data(substation, time_start=None, time_end=None):
+
     """
     Loads the minute data for a given substation
     :param substation: the name of the substation
@@ -67,7 +70,8 @@ def load_maxmin_data(substation, time_start=None, time_end=None):
     return data
 
 
-substation = 'staplegrove'
+
+
 
 
 def load_minute_data(substation, time_start=None, time_end=None):
