@@ -5,14 +5,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import arrow
-from datetime import datetime, timedelta, fromisoformat
+from datetime import datetime, timedelta
 
 
 # %%
 
 # %%
 
-dir_data_raw = '..\\data\\raw'
+dir_data_raw = 'data\\raw'
 dir_data_geev = os.path.join(dir_data_raw, 'geevor')
 dir_data_mous = os.path.join(dir_data_raw, 'mousehole')
 dir_data_stap = os.path.join(dir_data_raw, 'staplegrove')

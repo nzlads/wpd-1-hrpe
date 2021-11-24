@@ -29,7 +29,7 @@ python -m pip install poetry
 # or 
 pipx install poetry
 
-## Verify
+## Verify installed
 poetry --version
 
 # virtual env
@@ -37,7 +37,15 @@ python -m venv venv
 venv\Scripts\activate
 
 poetry install
+
+# Get raw data
+poetry run get-raw
+
 ```
+
+
+
+
 
 ### Poetry Commands
 

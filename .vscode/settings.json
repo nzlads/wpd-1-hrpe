@@ -1,3 +1,4 @@
 {
-    "jupyter.notebookFileRoot": "${workspaceRoot}"
+    "jupyter.notebookFileRoot": "${workspaceRoot}",
+    "workbench.tree.indent": 32
 }
