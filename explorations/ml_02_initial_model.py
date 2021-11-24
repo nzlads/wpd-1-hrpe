@@ -1,9 +1,12 @@
+import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
 from hrpe.data.load import load_minute_data
 from hrpe.features.time import make_datetime_features
+from hrpe.models.eval import score_model
 
+# load data
 data = load_minute_data("staplegrove")
 data = make_datetime_features(data)
 
@@ -28,39 +31,4 @@ hh_data["delta_max"] = hh_data["value_max"] - hh_data["value_mean"]
 hh_data["delta_min"] = hh_data["value_mean"] - hh_data["value_min"]
 hh_data["is_weekday"] = hh_data["is_weekday"].astype(int)
 
-# plot delta_max over time
-g = sns.FacetGrid(hh_data, col="period", col_wrap=8)
-g.map(sns.lineplot, "time", "delta_max")
-plt.show()
-# Plot shows that the larger deltas tend to occur at 6am to 6pm which makes sense
-
-g = sns.FacetGrid(hh_data, col="period", col_wrap=8)
-g.map(sns.lineplot, "time", "delta_min")
-plt.show()
-# Fairly similar patterns for delta_min
-
-# doens't seem to be much in day of week
-g = sns.FacetGrid(hh_data[hh_data["period"] == 24], row="day_of_week")
-g.map(sns.lineplot, "time", "delta_max")
-plt.show()
-
-# Value mean relationship is kind of weird, I can't quite explain it -
-# as value_mean increases (i.e. 30min avg demand increases) the delta_max decreases;
-# but is more variable at lower value_mean?
-sns.relplot(data=hh_data, x="value_mean", y="delta_max", col="period", col_wrap=8)
-sns.relplot(data=hh_data, x="value_mean", y="delta_max")
-sns.relplot(data=hh_data, x="value_mean", y="delta_min")
-plt.show()
-
-# %%
-# Test eval function
-preds = hh_data[["time", "value_max", "value_min", "value_mean"]]
-truths = preds.copy()
-
-bench = preds[["time", "value_mean"]]
-bench["value_max"] = preds["value_mean"]
-bench["value_min"] = preds["value_mean"]
-
-from hrpe.models.eval import score_model
-score_model(preds, truths) # should be 0
-score_model(bench, truths) # should be 1
+# Define base class for model
