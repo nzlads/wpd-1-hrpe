@@ -6,6 +6,7 @@ import os
 import glob
 import pandas as pd
 
+
 def load_minute_data(substation):
     """
     Loads the minute data for a given substation

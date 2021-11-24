@@ -1,11 +1,17 @@
+
 import seaborn as sns
 import matplotlib.pyplot as plt
 
 from hrpe.data.load import load_minute_data
 from hrpe.features.time import make_datetime_features
 
+x = 1
+print(x)
+
+
 data = load_minute_data("staplegrove")
 data = make_datetime_features(data)
+
 
 # First exploration: how many periods have bad data points?
 badpp = data.groupby("period_time").agg(
@@ -45,10 +51,12 @@ g = sns.FacetGrid(hh_data[hh_data["period"] == 24], row="day_of_week")
 g.map(sns.lineplot, "time", "delta_max")
 plt.show()
 
-# Value mean relationship is kind of weird, I can't quite explain it - 
-# as value_mean increases (i.e. 30min avg demand increases) the delta_max decreases; 
+# Value mean relationship is kind of weird, I can't quite explain it -
+# as value_mean increases (i.e. 30min avg demand increases) the delta_max decreases;
 # but is more variable at lower value_mean?
 sns.relplot(data=hh_data, x="value_mean", y="delta_max", col="period", col_wrap=8)
 sns.relplot(data=hh_data, x="value_mean", y="delta_max")
 sns.relplot(data=hh_data, x="value_mean", y="delta_min")
 plt.show()
+
+# %%
