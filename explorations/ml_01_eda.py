@@ -8,15 +8,15 @@ data = load_minute_data("staplegrove")
 data = make_datetime_features(data)
 
 # First exploration: how many periods have bad data points?
-# badpp = data.groupby("period_time").agg({'quality': lambda x: x.isin(["Bad", "Bad Ip"]).sum()})
-# print(f"There are {sum(badpp.quality > 0)} periods with bad data out of {len(badpp)}")
-# print(f"There are {sum(badpp.quality == 30)} periods that are entirely bad")
-# # 94 of 30672 periods have some bad data, is 0.3%
-# # 51 periods have entirely bad data data (all 30 mins are bad)
-# # 0.3% is not much to drop so just drop it
-# badpp["is_bad"] = badpp["quality"] > 0
-# data = data.merge(badpp[["is_bad"]], on="period_time")
-# data = data[~data["is_bad"]]
+badpp = data.groupby("period_time").agg({'quality': lambda x: x.isin(["Bad", "Bad Ip"]).sum()})
+print(f"There are {sum(badpp.quality > 0)} periods with bad data out of {len(badpp)}")
+print(f"There are {sum(badpp.quality == 30)} periods that are entirely bad")
+# 94 of 30672 periods have some bad data, is 0.3%
+# 51 periods have entirely bad data data (all 30 mins are bad)
+# 0.3% is not much to drop so just drop it
+badpp["is_bad"] = badpp["quality"] > 0
+data = data.merge(badpp[["is_bad"]], on="period_time")
+data = data[~data["is_bad"]]
 
 # Calculate the half-hourly features data from the minute data
 hh_data = data.groupby("period_time").agg({"value": ["max", "min", "mean"]})
