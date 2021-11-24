@@ -23,8 +23,9 @@ class SnaivePeriodModel(PeriodModel):
         Generate predictions for output for dates in forecast
         Expect forecast to have time, value_mean cols
         """
-        forecast["source_time"] = forecast["time"] - pd.DateOffset(**self.seasonalities)
-        forecast = forecast.merge(self.delta_data, left_on="source_time", right_on="time", suffixes=[None, "_hist"])
-        forecast["value_max"] = forecast["value_mean"] + forecast["delta_max"]
-        forecast["value_min"] = forecast["value_mean"] - forecast["delta_min"]
-        return forecast[["time", "value_max", "value_min", "value_mean"]]
+        fc = forecast.copy()
+        fc["source_time"] = fc["time"] - pd.DateOffset(**self.seasonalities)
+        fc = fc.merge(self.delta_data, left_on="source_time", right_on="time", suffixes=[None, "_hist"])
+        fc["value_max"] = fc["value_mean"] + fc["delta_max"]
+        fc["value_min"] = fc["value_mean"] - fc["delta_min"]
+        return fc[["time", "value_max", "value_min", "value_mean"]]
