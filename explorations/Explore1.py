@@ -1,11 +1,8 @@
 # %%
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
-import arrow
-import datetime
 
 
 # %%
@@ -83,7 +80,7 @@ plot_data = pd.merge(
 
 
 sns.relplot(
-    data=plot_data.query('time >= "2021-06-01"'),
+    data=plot_data.query('time >= "2021-07-28"'),
     x="time", y="values",
     hue="name",
     kind="line"
