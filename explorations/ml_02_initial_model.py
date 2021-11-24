@@ -2,24 +2,14 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from hrpe.data.load import load_minute_data
+from hrpe.data.load import load_minute_data, load_hh_data, load_maxmin_data
 from hrpe.features.time import make_datetime_features
 from hrpe.models.eval import score_model
+from hrpe.models.periodic import SnaivePeriodModel
 
 # load data
 data = load_minute_data("staplegrove")
 data = make_datetime_features(data)
-
-# First exploration: how many periods have bad data points?
-# badpp = data.groupby("period_time").agg({'quality': lambda x: x.isin(["Bad", "Bad Ip"]).sum()})
-# print(f"There are {sum(badpp.quality > 0)} periods with bad data out of {len(badpp)}")
-# print(f"There are {sum(badpp.quality == 30)} periods that are entirely bad")
-# # 94 of 30672 periods have some bad data, is 0.3%
-# # 51 periods have entirely bad data data (all 30 mins are bad)
-# # 0.3% is not much to drop so just drop it
-# badpp["is_bad"] = badpp["quality"] > 0
-# data = data.merge(badpp[["is_bad"]], on="period_time")
-# data = data[~data["is_bad"]]
 
 # Calculate the half-hourly features data from the minute data
 hh_data = data.groupby("period_time").agg({"value": ["max", "min", "mean"]})
@@ -32,3 +22,16 @@ hh_data["delta_min"] = hh_data["value_mean"] - hh_data["value_min"]
 hh_data["is_weekday"] = hh_data["is_weekday"].astype(int)
 
 # Define base class for model
+forecast = load_hh_data("staplegrove", time_start="2021-07-01", time_end="2021-08-01")
+forecast = forecast[["time", "value"]]
+forecast.columns = ["time", "value_mean"]
+
+mod = SnaivePeriodModel()
+mod.fit(hh_data, seasonalities={"years": 1})
+preds = mod.predict(forecast)
+
+truths = load_maxmin_data("staplegrove", time_start="2021-07-01", time_end="2021-08-01")
+truths = truths.merge(forecast, on="time")
+
+score_model(preds, truths)
+# 0.867
