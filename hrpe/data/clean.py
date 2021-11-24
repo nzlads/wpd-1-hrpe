@@ -19,6 +19,5 @@ def clean_maxmin_data(data: pd.DataFrame):
     return data
 
 
-
 def clean_minute_data(data: pd.DataFrame):
     return data
