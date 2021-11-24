@@ -6,7 +6,10 @@ import glob
 import pandas as pd
 import datetime
 import re
+<<<<<<< HEAD
 
+=======
+>>>>>>> Load complete
 
 def validate_date(date_text: str):
     """
@@ -75,6 +78,7 @@ def load_weather(substation, time_start=None, time_end=None):
 
 
 def load_hh_data(substation, time_start=None, time_end=None):
+
     """
     Loads the half hourly data for a given substation
     :param substation: the name of the substation
@@ -97,6 +101,12 @@ def load_hh_data(substation, time_start=None, time_end=None):
         if "half_hourly_real_power" in fil:
             filepath.append(fil)
 
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> Load complete
     data_list = list()
     for fl in filepath:
         # Get date in path
@@ -107,11 +117,14 @@ def load_hh_data(substation, time_start=None, time_end=None):
             file_type = file_type.group(1)
 
         # Read data, add type column
+
         pddata = pd.read_csv(fl, parse_dates=[0])
+
         pddata['type'] = file_type
         data_list.append(pddata)
 
     data = pd.concat(data_list)
+
 
     # Assert cols
     expected_cols = ['time', 'value', 'type']
