@@ -108,7 +108,7 @@ def load_hh_data(substation, time_start=None, time_end=None):
             file_type = file_type.group(1)
 
         # Read data, add type column
-        pddata = pd.read_csv(fl, parse_dates=[1])
+        pddata = pd.read_csv(fl, parse_dates=[0])
         pddata['type'] = file_type
         data_list.append(pddata)
 
@@ -151,7 +151,7 @@ def load_maxmin_data(substation, time_start=None, time_end=None):
 
 
     # Read data
-    data = pd.read_csv(filepath, parse_dates=[1])
+    data = pd.read_csv(filepath, parse_dates=[0])
 
     # Assert cols
     expected_cols = ['time', 'value_max', 'value_min']

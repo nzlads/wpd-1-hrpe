@@ -1,7 +1,7 @@
 import pandas as pd
 from hrpe.features.time import make_datetime_features
  
-def minute_data_to_hh_data(data:pd.DataFrame):
+def minute_data_to_hh_data(data: pd.DataFrame):
     """
     Transforms the raw minute data into half hour increments.
     """
