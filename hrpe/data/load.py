@@ -163,6 +163,11 @@ def load_maxmin_data(substation, time_start=None, time_end=None):
 
     return data
 
+    return data
+
+    for fil in files:
+        if "minute" in fil:
+            filepath = fil
 
 def load_minute_data(substation, time_start=None, time_end=None):
     """
