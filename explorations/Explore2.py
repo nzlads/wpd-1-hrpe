@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import arrow
-import datetime
+from datetime import datetime, timedelta, fromisoformat
 
 
 # %%
@@ -31,65 +31,76 @@ fs_hh_p_sep = os.path.join(dir_data_stap, "MW_Staplegrove_CB905_MW_observation_v
 
 # %%
 hh_p_preaug = pd.read_csv(fs_hh_p_preaug)
-hh_p_aug = pd.read_csv(fs_hh_p_aug)
-hh_p_sep = pd.read_csv(fs_hh_p_sep)
-
-# %%
 mm_p_preaug = pd.read_csv(fs_mm_p_preaug)
 minute_p_preaug = pd.read_csv(fs_minute_p_preaug)
 
+# %%
+hh = hh_p_preaug
+mm = mm_p_preaug
+sx = minute_p_preaug
+
+# %%
+hh.time = pd.to_datetime(hh.time)
+mm.time = pd.to_datetime(mm.time)
+sx.time = pd.to_datetime(sx.time)
+sx.maxtime = pd.to_datetime(sx.maxtime)
+sx.mintime = pd.to_datetime(sx.mintime)
+
+
+# %%
+t1 = '2019-11-01 00:00:00'
+t2 = '2019-11-01 01:00:00'
+hh = hh_p_preaug.query("time <= @t2")
+mm = mm_p_preaug.query("time <= @t2")
+sx = minute_p_preaug.query("time <= @t2")
+
+
+# %%
+# Function to take a time and convert it to a half hour between 1 and 48 index
+
+def time_to_half_hour_index(time):
+    # Convert string to datetime object
+    time = datetime.datetime.strptime(time, '%Y-%m-%d %H:%M:%S')
+    # Convert datetime object to a half hour index
+    half_hour_index = (time.hour) * 2 + (time.minute >= 30) + 1
+    return half_hour_index
+
+
+time_to_half_hour_index('2019-11-02 00:00:00')
 
 # %%
 
-hh_p_preaug["type"] = 'training'
-hh_p_aug["type"] = 'validation'
-hh_p_sep["type"] = 'test'
+
+ax = plt.step(sx.time, sx.value, where='post')
+plt.plot(sx.maxtime, sx.maxvalue, 'x', color='black')
+plt.plot(sx.mintime, sx.minvalue, 'o', color='black')
+plt.xticks(rotation=45)
+
+# %%
+# Generate every minute between two times
+# from datetime import datetime, timedelta
+
+# def datetime_range(start, end, delta):
+#     current = start
+#     while current < end:
+#         yield current
+#         current += delta
+
+# dts = [dt.strftime('%Y-%m-%d T%H:%M Z') for dt in
+#        datetime_range(datetime.fromisoformat(t1), datetime.fromisoformat(t2),
+#        timedelta(minutes=1))]
+
+# print(dts)
+# # xposition = [pd.to_datetime('2019-11-01 00:00:00'), pd.to_datetime('2019-11-01 00:06:00')]
 
 
 # %%
-hh_p = pd.concat([hh_p_preaug, hh_p_aug, hh_p_sep]).reset_index()
-hh_p['time'] = pd.to_datetime(hh_p['time'], format='%Y-%m-%d %H:%M:%S')
-
-
-# %%
-
-# Plot the responses for different events and regions
-ax = sns.lineplot(x="time", y="value",
-                  hue="type",
-                  data=hh_p)
-ax.set_xlim(hh_p['time'].min(), hh_p['time'].max())
-plt.xticks(rotation=15)
-plt.title('Raw Data')
-plt.show()
-# %%
-hh_p_preaug.time = pd.to_datetime(hh_p_preaug.time)
-mm_p_preaug.time = pd.to_datetime(mm_p_preaug.time)
-
-# join data from the hh_p and the mm_p_preaug data frames by the time column
-plot_data = pd.merge(
-    hh_p_preaug,
-    mm_p_preaug,
-    how='outer',
-    on='time'
-).melt(
-    id_vars=['time', 'type'],
-    var_name='name',
-    value_name='values'
-)
-# %%
-
-
-# plot_data.plot(x='time', y=['value', 'max', 'min'])
-
 
 sns.relplot(
-    data=plot_data.query('time >= "2021-06-01"'),
+    data=plot_data.query('time >= "2021-07-28"'),
     x="time", y="values",
     hue="name",
     kind="line"
     # size="choice", col="align", size_order=["T1", "T2"], palette=palette,
     # height=5, aspect=.75, facet_kws=dict(sharex=False),
 )
-
-
-# %%
