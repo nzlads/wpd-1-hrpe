@@ -7,6 +7,7 @@ import pandas as pd
 import datetime
 import re
 
+
 def validate_date(date_text: str):
     """
     Check a date, convert to a datetime object
@@ -25,7 +26,7 @@ def validate_date(date_text: str):
 
 def check_substation(substation: str):
     """
-    Check a date, convert to a datetime object
+    Check a substation belongs to valid substations
 
     :param substation: A string in the following list ['staplegrove', 'geevor', 'mousehole']
     :returns: substation 
@@ -33,8 +34,9 @@ def check_substation(substation: str):
     """
     substation = substation.lower()
     valid_stations = ['staplegrove', 'geevor', 'mousehole']
-    if (substation not in valid_stations):
-        raise Exception(f"substation not in valid list: {valid_stations}")
+    
+    assert substation in valid_stations, f"substation not in valid list: {valid_stations}"
+
     return substation
 
 
@@ -47,7 +49,7 @@ def time_check(time_start, time_end):
 
     Returns:
         [list(dt, dt)]: [packed list of start and end times]
-    """  
+    """
 
     if(time_start is not None):
         time_start = validate_date(time_start)
@@ -68,19 +70,11 @@ def filter_data_by_time(data, time_start, time_end):
     return data
 
 
-
-
-
-
-
-
-
 def load_weather(substation, time_start=None, time_end=None):
     pass
 
 
 def load_hh_data(substation, time_start=None, time_end=None):
-    
     """
     Loads the half hourly data for a given substation
     :param substation: the name of the substation
@@ -103,9 +97,6 @@ def load_hh_data(substation, time_start=None, time_end=None):
         if "half_hourly_real_power" in fil:
             filepath.append(fil)
 
-
-
-
     data_list = list()
     for fl in filepath:
         # Get date in path
@@ -122,7 +113,6 @@ def load_hh_data(substation, time_start=None, time_end=None):
 
     data = pd.concat(data_list)
 
-
     # Assert cols
     expected_cols = ['time', 'value', 'type']
     col_names_match = data.columns == expected_cols
@@ -137,7 +127,6 @@ def load_hh_data(substation, time_start=None, time_end=None):
 
 
 def load_maxmin_data(substation, time_start=None, time_end=None):
-
     """
     Loads the maxmin data for a given substation
     :param substation: the name of the substation
@@ -173,10 +162,6 @@ def load_maxmin_data(substation, time_start=None, time_end=None):
     data = filter_data_by_time(data, time_start, time_end)
 
     return data
-
-
-
-
 
 
 def load_minute_data(substation, time_start=None, time_end=None):
