@@ -22,9 +22,6 @@ def calculate_deltas(data):
 
     return hh_data
 
-
- 	hh_data["is_weekday"] = hh_data["is_weekday"].astype(int)
-
 def calculate_maxmin(data):
     """
     take  Half hourly data, work out value min and value max

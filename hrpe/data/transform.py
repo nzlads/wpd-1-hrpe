@@ -1,5 +1,5 @@
 import pandas as pd
-from features.time import make_datetime_features
+from hrpe.features.time import make_datetime_features
  
 def minute_data_to_hh_data(data:pd.DataFrame):
     """
@@ -8,8 +8,8 @@ def minute_data_to_hh_data(data:pd.DataFrame):
 
     df = data.copy()
 
-    if not df["period_time"]:
-        df = make_datetime_features(df).reset_index(drop=True)
+    if not "period_time" in  df.columns:
+        df = make_datetime_features(df)
 
 
     hh_data = df.groupby("period_time").agg({"value": ["max", "min", "mean"]})
