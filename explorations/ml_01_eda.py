@@ -5,9 +5,6 @@ import matplotlib.pyplot as plt
 from hrpe.data.load import load_minute_data
 from hrpe.features.time import make_datetime_features
 
-x = 1
-print(x)
-
 
 data = load_minute_data("staplegrove")
 data = make_datetime_features(data)
@@ -23,7 +20,8 @@ print(f"There are {sum(badpp.quality == 30)} periods that are entirely bad")
 # 51 periods have entirely bad data data (all 30 mins are bad)
 # 0.3% is not much to drop so just drop it
 badpp["is_bad"] = badpp["quality"] > 0
-data = data.merge(badpp[["is_bad"]], on="period_time")[~data["is_bad"]]
+data = data.merge(badpp[["is_bad"]], on="period_time")
+data = data[~data["is_bad"]]
 
 # Calculate the half-hourly features data from the minute data
 hh_data = data.groupby("period_time").agg({"value": ["max", "min", "mean"]})

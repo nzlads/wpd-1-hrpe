@@ -7,8 +7,13 @@ import glob
 import pandas as pd
 
 
-def load_hh_data(substation, time_start = None, time_end = nNone )
+def load_weather(substation, time_start=None, time_end=None):
 
+
+def load_hh_data(substation, time_start=None, time_end=None):
+
+
+def load_maxmin_data(substation, time_start=None, time_end=None):
 
 
 def load_minute_data(substation):
