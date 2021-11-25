@@ -39,7 +39,7 @@ def create_submissions_file(
 def _validate_submissions_data(data, month, year):
 
     assert all(
-        ["time", "value_max", "value_min"] == data.columns
+        ["time", "value_max", "value_min"] in data.columns
     ), "The data must have the columns 'time', 'value_max', 'value_min'"
 
     month_num = datetime.strptime(month, "%B").month
