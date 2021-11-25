@@ -6,7 +6,6 @@ import glob
 import pandas as pd
 import datetime
 import re
-from hrpe.data.raw import unzip_weather
 
 
 def validate_date(date_text: str):
@@ -89,7 +88,7 @@ def load_weather(substation, time_start=None, time_end=None):
     # File path - find minute data
     file_dir = os.path.join("data", "raw", "weather")
     if not os.path.exists(file_dir):
-        unzip_weather()
+        raise Exception("run `poetry run get-raw`")  # unzip_weather()
 
     files = glob.glob(rf"{file_dir}/*.csv")
 

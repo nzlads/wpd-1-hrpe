@@ -3,6 +3,20 @@ import requests
 from zipfile import ZipFile
 
 
+def prep_repo():
+    download()
+    unzip_weather()
+
+
+def unzip_weather():
+    if os.path.exists("data/raw/weather"):
+        print("Weather data already extracted")
+        return
+
+    with ZipFile("data/raw/Weather.zip", "r") as zip_ref:
+        zip_ref.extractall("data/raw/weather")
+
+
 def download(verbose=True):
     """
     Downloads raw data and submission templates from links as provided on the link
@@ -38,12 +52,3 @@ def download(verbose=True):
         with ZipFile(target_zip) as z:
             z.extractall(target_dir)
         os.remove(target_zip)
-
-
-def unzip_weather():
-    if os.path.exists("data/raw/weather"):
-        print("Weather data already extracted")
-        return
-
-    with ZipFile("data/raw/Weather.zip", "r") as zip_ref:
-        zip_ref.extractall("data/raw/weather")

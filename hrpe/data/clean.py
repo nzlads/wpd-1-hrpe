@@ -8,6 +8,7 @@ import pandas as pd
 
 
 def clean_weather(data: pd.DataFrame):
+
     return data
 
 
