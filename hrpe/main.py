@@ -1,9 +1,9 @@
 import os
 
 
-from hrpe.data import *
 from hrpe.data.load import load_hh_data, load_maxmin_data, load_minute_data
-from hrpe.data.clean import load_hh_data, load_maxmin_data, load_minute_data
+from hrpe.data.clean import clean_hh_data, clean_maxmin_data, clean_minute_data
+from hrpe.features.transform import minute_data_to_hh_data
 
 
 def main():
@@ -28,6 +28,8 @@ def main():
     # Build features / differences
 
     min2hh_data = minute_data_to_hh_data(maxmin_data)
+
+    return min2hh_data
 
 
 # Model
