@@ -1,3 +1,5 @@
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 # Western Power Distribution Data Challenge 1: High Resolution Peak Estimation
 
 This is the data for the first of three Western Power Distribution (WPD) short data challenges! The aims of these
@@ -26,7 +28,7 @@ the long term) as it requires investment in additional storage, communications e
 (Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py -UseBasicParsing).Content | python -
 # Otherwise manual install with
 python -m pip install poetry
-# or 
+# or
 pipx install poetry
 
 ## Verify installed
@@ -36,7 +38,11 @@ poetry --version
 python -m venv venv
 venv\Scripts\activate
 
+#install packages
 poetry install
+
+#install precommit hooks
+pre-commit install
 
 # Get raw data
 poetry run get-raw

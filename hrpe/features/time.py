@@ -27,4 +27,4 @@ def make_datetime_features(data: pd.DataFrame):
     # Create the period timestamp
     df["period_time"] = data["time"].dt.floor("30T")
 
-    return (df)
+    return df

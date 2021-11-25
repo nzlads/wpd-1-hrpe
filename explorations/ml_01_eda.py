@@ -8,7 +8,9 @@ data = load_minute_data("staplegrove")
 data = make_datetime_features(data)
 
 # First exploration: how many periods have bad data points?
-badpp = data.groupby("period_time").agg({'quality': lambda x: x.isin(["Bad", "Bad Ip"]).sum()})
+badpp = data.groupby("period_time").agg(
+    {"quality": lambda x: x.isin(["Bad", "Bad Ip"]).sum()}
+)
 print(f"There are {sum(badpp.quality > 0)} periods with bad data out of {len(badpp)}")
 print(f"There are {sum(badpp.quality == 30)} periods that are entirely bad")
 # 94 of 30672 periods have some bad data, is 0.3%
@@ -20,7 +22,7 @@ data = data[~data["is_bad"]]
 
 # Calculate the half-hourly features data from the minute data
 hh_data = data.groupby("period_time").agg({"value": ["max", "min", "mean"]})
-hh_data.columns = ['_'.join(col) for col in hh_data.columns.to_flat_index()]
+hh_data.columns = ["_".join(col) for col in hh_data.columns.to_flat_index()]
 hh_data["time"] = hh_data.index
 hh_data = make_datetime_features(hh_data).reset_index(drop=True)
 
@@ -62,5 +64,6 @@ bench["value_max"] = preds["value_mean"]
 bench["value_min"] = preds["value_mean"]
 
 from hrpe.models.eval import score_model
-score_model(preds, truths) # should be 0
-score_model(bench, truths) # should be 1
+
+score_model(preds, truths)  # should be 0
+score_model(bench, truths)  # should be 1
