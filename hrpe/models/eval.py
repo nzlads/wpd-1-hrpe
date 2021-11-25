@@ -36,7 +36,7 @@ def score_model(preds, truths):
     truth = truths.copy().sort_values("time")
 
     assert all(
-        pred["time"] == truth["time"]
+        pred["time"].values == truth["time"].values
     ), "The time col for preds and truths do not match"
 
     # Create benchmark table
