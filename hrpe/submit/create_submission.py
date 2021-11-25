@@ -2,7 +2,7 @@ from zipfile import ZipFile
 from glob import glob
 from datetime import datetime
 from calendar import monthrange
-from os import remove
+import os
 from shutil import copyfile
 
 import pandas as pd
@@ -80,7 +80,8 @@ def _zip_submissions_file(csv_path):
     req_name = "predictions.csv"
     req_path = os.path.join("data/submissions", req_name)
 
-    os.remove(zip_name)
+    if os.path.exists(zip_name):
+        os.remove(zip_name)
 
     copyfile(csv_path, req_path)
 
