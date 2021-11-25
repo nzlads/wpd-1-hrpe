@@ -6,6 +6,7 @@ import glob
 import pandas as pd
 import datetime
 import re
+from hrpe.data.raw import unzip_weather
 
 
 def validate_date(date_text: str):
@@ -23,7 +24,7 @@ def validate_date(date_text: str):
         raise ValueError("Incorrect data format, should be YYYY-MM-DD")
 
 
-def check_substation(substation: str):
+def check_substation(substation: str, valid_stations=None):
     """
     Check a substation belongs to valid substations list
 
@@ -31,8 +32,10 @@ def check_substation(substation: str):
     :returns: substation
     :raises keyError: identifies if it doesn't match the list
     """
+
     substation = substation.lower()
-    valid_stations = ["staplegrove", "geevor", "mousehole"]
+    if valid_stations is None:
+        valid_stations = ["staplegrove", "geevor", "mousehole"]
 
     assert (
         substation in valid_stations
@@ -72,6 +75,70 @@ def filter_data_by_time(data, time_start, time_end):
 
 
 def load_weather(substation, time_start=None, time_end=None):
+    """
+    Loads the half hourly data for a given substation
+    :param substation: the name of the substation
+    """
+
+    # whatever
+    check_substation(substation, valid_stations=["staplegrove", "mousehole"])
+
+    # Get times
+    time_start, time_end = time_check(time_start, time_end)
+
+    # File path - find minute data
+    file_dir = os.path.join("data", "raw", "weather")
+    if not os.path.exists(file_dir):
+        unzip_weather()
+
+    files = glob.glob(rf"{file_dir}/*.csv")
+
+    filepath = list()
+    for fil in files:
+        if substation in fil:
+            filepath.append(fil)
+
+    data_list = list()
+    for fl in filepath:
+        # Get date in path
+        file_type = re.search(f"df_{substation}_(.+?)_hourly.csv", fl)
+        if file_type is None:
+            file_type = "all"
+        else:
+            file_type = file_type.group(1)
+
+        # Read data, add type column
+        pddata = pd.read_csv(fl, parse_dates=[0])
+        pddata["station"] = file_type
+        data_list.append(pddata)
+
+    data = pd.concat(data_list)
+
+    # Assert cols
+    expected_cols = [
+        "datetime",
+        "temperature",
+        "solar_irradiance",
+        "windspeed_north",
+        "windspeed_east",
+        "pressure",
+        "spec_humidity",
+        "station",
+    ]
+    col_names_match = data.columns == expected_cols
+
+    if not all(col_names_match):
+        raise Exception(
+            f"Column names do not match\nGot: {data.columns},\n expected: {expected_cols}"
+        )
+
+    # Consistent names with others
+    data.rename(columns={"datetime": "time"}, inplace=True)
+    # Filter by time
+    data = filter_data_by_time(data, time_start, time_end)
+
+    return data
+
     pass
 
 
