@@ -28,12 +28,16 @@ def score_model(preds, truths):
     EXPECTED_COLS = ["time", "value_max", "value_min", "value_mean"]
     for df in [preds, truths]:
         missing = [col for col in EXPECTED_COLS if col not in df.columns]
-        assert missing == [], f"The following columns are missing from {df.name}: {missing}"
+        assert (
+            missing == []
+        ), f"The following columns are missing from {df.name}: {missing}"
 
     pred = preds.copy().sort_values("time")
     truth = truths.copy().sort_values("time")
 
-    assert all(pred["time"] == truth["time"]), "The time col for preds and truths do not match"
+    assert all(
+        pred["time"] == truth["time"]
+    ), "The time col for preds and truths do not match"
 
     # Create benchmark table
     bench = pred[["time"]]
@@ -43,4 +47,4 @@ def score_model(preds, truths):
     pred_rmse = rmse(pred, truth)
     bench_rmse = rmse(bench, truth)
 
-    return (pred_rmse / bench_rmse)
+    return pred_rmse / bench_rmse

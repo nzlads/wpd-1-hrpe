@@ -13,7 +13,7 @@ data = make_datetime_features(data)
 
 # Calculate the half-hourly features data from the minute data
 hh_data = data.groupby("period_time").agg({"value": ["max", "min", "mean"]})
-hh_data.columns = ['_'.join(col) for col in hh_data.columns.to_flat_index()]
+hh_data.columns = ["_".join(col) for col in hh_data.columns.to_flat_index()]
 hh_data["time"] = hh_data.index
 hh_data = make_datetime_features(hh_data).reset_index(drop=True)
 

@@ -13,6 +13,7 @@ arrow = "^1.2.1"
 seaborn = "^0.11.2"
 pre-commit = "^2.15.0"
 u8darts = {extras = ["pdarima"], version = "^0.13.1"}
+black = "^21.11b1"
 
 
 [tool.poetry.dev-dependencies]
