@@ -1,6 +1,7 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+from hrpe.models.eval import score_model
 from hrpe.data.load import load_minute_data
 from hrpe.features.time import make_datetime_features
 
@@ -62,8 +63,6 @@ truths = preds.copy()
 bench = preds[["time", "value_mean"]]
 bench["value_max"] = preds["value_mean"]
 bench["value_min"] = preds["value_mean"]
-
-from hrpe.models.eval import score_model
 
 score_model(preds, truths)  # should be 0
 score_model(bench, truths)  # should be 1
