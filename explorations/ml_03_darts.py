@@ -98,4 +98,4 @@ aug_hh = load_hh_data("staplegrove").query("type == 'august'")[["time", "value"]
 aug_hh.columns = ["time", "value_mean"]
 
 aug_preds = aug_ets.predict(aug_hh)
-create_submissions_file(aug_preds[["time", "value_max", "value_min"]], "august", "ml")
+create_submissions_file(aug_preds, "august", "ml")
