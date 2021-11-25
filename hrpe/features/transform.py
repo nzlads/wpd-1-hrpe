@@ -9,7 +9,7 @@ def minute_data_to_hh_data(data: pd.DataFrame):
 
     df = data.copy()
 
-    if "period_time" not in df.columns:
+    if not "period_time" in df.columns:
         df = make_datetime_features(df)
 
     # hh_data = df.groupby("period_time").agg({"value": ["max", "min", "mean"],"period": ['first'],"day_of_week":['first'],"month_of_year":['first'],"year":['first']})

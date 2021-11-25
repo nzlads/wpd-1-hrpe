@@ -1,9 +1,9 @@
 import pandas as pd
 
-from .base import PeriodModel
+from .base import Model
 
 
-class SnaivePeriodModel(PeriodModel):
+class SnaivePeriodModel(Model):
     """
     A basic naive model that fits model per period
     """

@@ -2,7 +2,9 @@ from zipfile import ZipFile
 from glob import glob
 from datetime import datetime
 from calendar import monthrange
-from os import remove
+import os
+from shutil import copyfile
+
 import pandas as pd
 
 from hrpe.data.load import filter_data_by_time
@@ -38,9 +40,11 @@ def create_submissions_file(
 
 def _validate_submissions_data(data, month, year):
 
-    assert all(
-        ["time", "value_max", "value_min"] in data.columns
+    assert {"time", "value_max", "value_min"}.issubset(
+        data.columns
     ), "The data must have the columns 'time', 'value_max', 'value_min'"
+
+    data = data[["time", "value_max", "value_min"]]
 
     month_num = datetime.strptime(month, "%B").month
     ndays = monthrange(year, month_num)[1]
@@ -73,11 +77,18 @@ def _create_submission_csv(data, userinitials):
 def _zip_submissions_file(csv_path):
     # Zip the csv file defined the path and rename it to 'Predictions.zip'
     zip_name = "data/Predictions.zip"
-    os.remove(zip_name)
+    req_name = "predictions.csv"
+    req_path = os.path.join("data/submissions", req_name)
+
+    if os.path.exists(zip_name):
+        os.remove(zip_name)
+
+    copyfile(csv_path, req_path)
 
     with ZipFile(zip_name, "w") as zipf:
-        zipf.write(csv_path)
+        zipf.write(req_path, arcname=req_name)
 
     print(f"Submissions at {zip_name}")
+    os.remove(req_path)
 
     return zip_name

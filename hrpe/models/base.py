@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-class PeriodModel:
+class Model:
     expected_cols = [
         "time",
         "value_max",
