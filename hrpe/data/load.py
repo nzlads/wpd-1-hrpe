@@ -73,7 +73,7 @@ def filter_data_by_time(data, time_start, time_end):
     return data
 
 
-def load_weather(substation, time_start=None, time_end=None):
+def load_weather_data(substation, time_start=None, time_end=None):
     """
     Loads the half hourly data for a given substation
     :param substation: the name of the substation

@@ -1,9 +1,14 @@
 import os
 
 
-from hrpe.data.load import load_hh_data, load_maxmin_data, load_minute_data
-from hrpe.data.clean import clean_hh_data, clean_maxmin_data, clean_minute_data
+from hrpe.data.load import (
+    load_hh_data,
+    load_maxmin_data,
+    load_minute_data,
+    load_weather_data,
+)
 from hrpe.features.transform import minute_data_to_hh_data
+from hrpe.features.weather import interpolate_weather
 
 
 def main():
@@ -19,13 +24,10 @@ def main():
     hh_data = load_hh_data(substation=substation)
     maxmin_data = load_maxmin_data(substation=substation)
     minute_data = load_minute_data(substation=substation)
-
-    # Data clean
-    hh_data = clean_hh_data(data=hh_data)
-    maxmin_data = clean_maxmin_data(data=maxmin_data)
-    minute_data = clean_minute_data(data=minute_data)
+    weather_data = load_weather_data(substation=substation)
 
     # Build features / differences
+    iweather = interpolate_weather(weather_data)
 
     min2hh_data = minute_data_to_hh_data(maxmin_data)
 
