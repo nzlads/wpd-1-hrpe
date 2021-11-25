@@ -6,7 +6,6 @@ import glob
 import pandas as pd
 import datetime
 import re
-from hrpe.data.raw import unzip_weather
 
 
 def validate_date(date_text: str):
@@ -74,7 +73,7 @@ def filter_data_by_time(data, time_start, time_end):
     return data
 
 
-def load_weather(substation, time_start=None, time_end=None):
+def load_weather_data(substation, time_start=None, time_end=None):
     """
     Loads the half hourly data for a given substation
     :param substation: the name of the substation
@@ -89,7 +88,7 @@ def load_weather(substation, time_start=None, time_end=None):
     # File path - find minute data
     file_dir = os.path.join("data", "raw", "weather")
     if not os.path.exists(file_dir):
-        unzip_weather()
+        raise Exception("run `poetry run get-raw`")  # unzip_weather()
 
     files = glob.glob(rf"{file_dir}/*.csv")
 

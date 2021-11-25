@@ -77,11 +77,11 @@ def _create_submission_csv(data, userinitials):
 def _zip_submissions_file(csv_path):
     # Zip the csv file defined the path and rename it to 'Predictions.zip'
     zip_name = "data/Predictions.zip"
-    req_name = "predictions.csv"
-    req_path = os.path.join("data/submissions", req_name)
-
     if os.path.exists(zip_name):
         os.remove(zip_name)
+
+    req_name = "predictions.csv"
+    req_path = os.path.join("data/submissions", req_name)
 
     copyfile(csv_path, req_path)
 
