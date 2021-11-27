@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 from hrpe.data.load import load_minute_data, load_hh_data, load_maxmin_data
 from hrpe.features.time import make_datetime_features
 from hrpe.models.eval import score_model
-from hrpe.models.periodic import SnaivePeriodModel
+
+# from hrpe.models.periodic import SnaivePeriodModel
 
 # load data
 data = load_minute_data("staplegrove")
@@ -22,18 +23,19 @@ hh_data["delta_min"] = hh_data["value_mean"] - hh_data["value_min"]
 hh_data["is_weekday"] = hh_data["is_weekday"].astype(int)
 
 # Define base class for model
+# WARNING: This code is deprecated as the relevant model and
+# class have been removed in favour of darts
+# mod = SnaivePeriodModel(seasonalities={"years": 1})
+# mod.fit(hh_data)
 
-mod = SnaivePeriodModel(seasonalities={"years": 1})
-mod.fit(hh_data)
 
+# truths = load_maxmin_data("staplegrove", time_start="2021-07-01", time_end="2021-08-01")
+# forecast = load_hh_data("staplegrove", time_start="2021-07-01", time_end="2021-08-01")
+# forecast = forecast[["time", "value"]]
+# forecast.columns = ["time", "value_mean"]
 
-truths = load_maxmin_data("staplegrove", time_start="2021-07-01", time_end="2021-08-01")
-forecast = load_hh_data("staplegrove", time_start="2021-07-01", time_end="2021-08-01")
-forecast = forecast[["time", "value"]]
-forecast.columns = ["time", "value_mean"]
+# truths = truths.merge(forecast, on="time")
 
-truths = truths.merge(forecast, on="time")
-
-preds = mod.predict(forecast)
-score_model(preds, truths)
+# preds = mod.predict(forecast)
+# score_model(preds, truths)
 # 0.867
