@@ -13,7 +13,7 @@ class DartsModel:
         self.dmin_model = dmin_model
 
     def __str__(self):
-        return f"Delta Max model: {str(self.dmax_model)}\nDelta Min model: {str(self.dmin_model)}"
+        return f"Delta Max model: {str(self.dmax_model)}; Delta Min model: {str(self.dmin_model)}"
 
     def _check_train_data(self, train: pd.DataFrame):
         """
@@ -76,3 +76,9 @@ class DartsModel:
         fc["value_max"] = fc["value_mean"] + fc["delta_max"]
         fc["value_min"] = fc["value_mean"] - fc["delta_min"]
         return fc.reset_index()[["time", "value_max", "value_min", "value_mean"]]
+
+
+class BestThetaModel(DartsModel):
+    """
+    Using Theta, but best value of theta
+    """
