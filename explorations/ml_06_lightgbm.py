@@ -9,6 +9,8 @@ from hrpe.features.deltas import calculate_deltas
 from hrpe.features.time import make_datetime_features
 from hrpe.models.eval import score_model
 
+from hrpe.models.darts import DartsLGBMModel
+
 # Fuck it just try lightgbm?
 from darts import TimeSeries
 from darts.models import LightGBMModel
@@ -76,10 +78,10 @@ dmin_cov_test = TimeSeries.from_dataframe(
 )
 
 dmax_preds = dmax_lgbm.predict(
-    n=len(dmax_cov_test), future_covariates=dmax_cov_test
+    n=len(test), future_covariates=dmax_cov_test
 ).pd_dataframe()
 dmin_preds = dmin_lgbm.predict(
-    n=len(dmin_cov_test), future_covariates=dmin_cov_test
+    n=len(test), future_covariates=dmin_cov_test
 ).pd_dataframe()
 
 preds = pd.DataFrame.join(dmax_preds, dmin_preds).join(
@@ -93,4 +95,53 @@ print(score_model(preds.reset_index(), truths.reset_index(drop=True)))
 # With average is 0.4522, way better than ETS basic model
 # With station 1 is 0.447, also way better than basic (no other covariate) models
 
-# %%
+# %% Attempt using custom class
+# Restate for convenience of reading
+dmax_covariates = [
+    "value_mean",
+    "period",
+    "day_of_week",
+    "is_weekday",
+    "temperature",
+    "solar_irradiance",
+]
+dmin_covariates = [
+    "value_mean",
+    "period",
+    "day_of_week",
+    "is_weekday",
+    "temperature",
+    "solar_irradiance",
+]
+
+
+lgbm = DartsLGBMModel(
+    dmax_covariates=dmax_covariates,
+    dmin_covariates=dmin_covariates,
+    dmax_lags={"lags": None, "lags_future_covariates": [0] * len(dmax_covariates)},
+    dmin_lags={"lags": None, "lags_future_covariates": [0] * len(dmin_covariates)},
+)
+
+lgbm.fit(train)
+custom_preds = lgbm.predict(
+    forecast=test[["time", "value_mean"]], future_covariates_df=test
+)
+
+truths = test[["time", "value_max", "value_min", "value_mean"]].reset_index(drop=True)
+score_model(custom_preds, truths)
+# Works!
+# %% Attempt custom model with lags
+lgbm_lags = DartsLGBMModel(
+    dmax_covariates=dmax_covariates,
+    dmin_covariates=dmin_covariates,
+    dmax_lags={"lags": 48, "lags_future_covariates": [0] * len(dmax_covariates)},
+    dmin_lags={"lags": 48, "lags_future_covariates": [0] * len(dmin_covariates)},
+)
+lgbm_lags.fit(train)
+lags_preds = lgbm_lags.predict(
+    forecast=test[["time", "value_mean"]], future_covariates_df=data
+)
+
+truths = test[["time", "value_max", "value_min", "value_mean"]].reset_index(drop=True)
+score_model(lags_preds, truths)
+# Also works! This particular one happens to be a lil worse than the previous
