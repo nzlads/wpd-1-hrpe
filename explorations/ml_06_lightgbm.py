@@ -21,9 +21,9 @@ maxmin_data = load_maxmin_data(SUBSTATION)
 weather_data = load_weather_data(SUBSTATION)
 weather_data = interpolate_weather(weather_data)
 # Average the weather data
-weather_data = weather_data.groupby("time").agg("mean")
+# weather_data = weather_data.groupby("time").agg("mean")
 # Alternatively, only take station 1
-# weather_data = weather_data.query("station == '1'")
+weather_data = weather_data.query("station == '1'")
 
 #%% Merge data
 demand_data = pd.merge(maxmin_data, hh_data, on="time").rename(
@@ -90,4 +90,7 @@ preds["value_min"] = preds["value_mean"] - preds["delta_min"]
 
 truths = test[["time", "value_max", "value_min", "value_mean"]]
 print(score_model(preds.reset_index(), truths.reset_index(drop=True)))
-# Is 0.4522, way better than ETS basic model
+# With average is 0.4522, way better than ETS basic model
+# With station 1 is 0.447, also way better than basic (no other covariate) models
+
+# %%
