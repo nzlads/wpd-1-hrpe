@@ -134,7 +134,7 @@ def load_weather_data(substation, time_start=None, time_end=None):
     # Consistent names with others
     data.rename(columns={"datetime": "time"}, inplace=True)
     # Filter by time
-    data = filter_data_by_time(data, time_start, time_end)
+    data = filter_data_by_time(data, time_start, time_end).sort_values("time")
 
     return data
 
@@ -191,7 +191,7 @@ def load_hh_data(substation, time_start=None, time_end=None):
         )
 
     # Filter by time
-    data = filter_data_by_time(data, time_start, time_end)
+    data = filter_data_by_time(data, time_start, time_end).sort_values("time")
 
     return data
 
@@ -214,12 +214,11 @@ def load_maxmin_data(substation, time_start=None, time_end=None):
         raise Exception("The requested substation does not exist")
     files = glob.glob(rf"{file_dir}/*.csv")
 
-    for fil in files:
-        if "max_min" in fil:
-            filepath = fil
+    filepaths = [fil for fil in files if "max_min" in fil]
 
     # Read data
-    data = pd.read_csv(filepath, parse_dates=[0])
+    dfs = [pd.read_csv(filepath, parse_dates=[0]) for filepath in filepaths]
+    data = pd.concat(dfs)
 
     # Assert cols
     expected_cols = ["time", "value_max", "value_min"]
@@ -231,7 +230,7 @@ def load_maxmin_data(substation, time_start=None, time_end=None):
         )
 
     # Filter by time
-    data = filter_data_by_time(data, time_start, time_end)
+    data = filter_data_by_time(data, time_start, time_end).sort_values("time")
 
     return data
 
@@ -259,12 +258,11 @@ def load_minute_data(substation, time_start=None, time_end=None):
         raise Exception("The requested substation does not exist")
     files = glob.glob(rf"{file_dir}/*.csv")
 
-    for fil in files:
-        if "minute" in fil:
-            filepath = fil
+    filepaths = [fil for fil in files if "minute" in fil]
 
     # Read data
-    data = pd.read_csv(filepath, parse_dates=[2, 4, 8])
+    dfs = [pd.read_csv(filepath, parse_dates=[2, 4, 8]) for filepath in filepaths]
+    data = pd.concat(dfs)
 
     # Assert cols
     expected_cols = [
@@ -288,6 +286,6 @@ def load_minute_data(substation, time_start=None, time_end=None):
         )
 
     # Filter by time
-    data = filter_data_by_time(data, time_start, time_end)
+    data = filter_data_by_time(data, time_start, time_end).sort_values("time")
 
     return data

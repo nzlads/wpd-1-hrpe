@@ -41,8 +41,8 @@ def score_model(preds, truths):
 
     # Create benchmark table
     bench = pred[["time"]]
-    bench["value_max"] = pred["value_mean"]
-    bench["value_min"] = pred["value_mean"]
+    bench.loc[:, "value_max"] = pred["value_mean"]
+    bench.loc[:, "value_min"] = pred["value_mean"]
 
     pred_rmse = rmse(pred, truth)
     bench_rmse = rmse(bench, truth)
