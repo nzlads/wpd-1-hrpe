@@ -129,6 +129,8 @@ dmax_model = DeltaLGBMModel(
 cv_scores = cross_validate(dmax_model, msplit, data, "delta_max", verbose=True)
 print(cv_scores)
 # %% Now test various combinations
+# WARNING: This takes 63 x 4 mins to run in its current form
+# TODO: Parallelise me!
 def powerset(iterable):
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1))
@@ -157,3 +159,34 @@ for cov_list in powerset(dmax_covariates):
 all_scores = pd.concat(all_scores)
 print(all_scores)
 # %%
+all_scores.groupby("covariates").agg({"mse": "mean"}).sort_values("mse")
+# The covariates with the lowest avg mse across 5 splits is
+# value_mean, period, temperature, solar_irradiance
+
+# Now need to repeat for min, but I suspect that would be the same outcome, so just build a model with it:
+
+# %% Best basic LGBM Model I think
+best_covariates = ["value_mean", "period", "temperature", "solar_irradiance"]
+
+lgbm = DartsLGBMModel(
+    dmax_covariates=best_covariates,
+    dmin_covariates=best_covariates,
+    dmax_lags={"lags": None, "lags_future_covariates": [0] * len(best_covariates)},
+    dmin_lags={"lags": None, "lags_future_covariates": [0] * len(best_covariates)},
+)
+
+skill_scores = []
+for train, test in msplit.split(data):
+    test_start = test.time.min()
+    lgbm.fit(train)
+    custom_preds = lgbm.predict(
+        forecast=test[["time", "value_mean"]], future_covariates_df=test
+    )
+    truths = test[["time", "value_max", "value_min", "value_mean"]].reset_index(
+        drop=True
+    )
+    skill_score = score_model(custom_preds, truths)
+    skill_scores.append([test_start, skill_score])
+skill_scores = pd.DataFrame(skill_scores, columns=["test_start", "skill_score"])
+skill_scores
+# August skill score 0.444 is better than the full covariate set
