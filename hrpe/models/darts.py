@@ -52,6 +52,25 @@ class DartsModel:
             df, time_col="time", value_cols=target, freq="30T"
         )
 
+    def _check_lags_dict(self, lags_dict: dict, num_covariates: int = 0):
+        assert "lags" in lags_dict.keys(), "Must define lags"
+
+        if num_covariates > 0:
+            assert (
+                "lags_future_covariates" in lags_dict.keys()
+            ), "Must define lags_future_covariates"
+            if type(lags_dict["lags_future_covariates"]) == list:
+                assert (
+                    len(lags_dict["lags_future_covariates"]) == num_covariates
+                ), "lags_future_covariates as list must be same length as number of covariates"
+                assert all(
+                    type(i) == int for i in lags_dict["lags_future_covariates"]
+                ), "lags_future_covariates should be list of ints"
+            else:
+                assert (
+                    type(lags_dict["lags_future_covariates"]) == tuple
+                ), "If not using list of integers, lags_future_covariates should be a tuple"
+
     def fit(self, train: pd.DataFrame):
         self._check_train_data(train)
 
@@ -83,25 +102,6 @@ class DartsLGBMModel(DartsModel):
     """
     Class implementing LGBM model for dmax and dmin
     """
-
-    def _check_lags_dict(self, lags_dict: dict, num_covariates: int = 0):
-        assert "lags" in lags_dict.keys(), "Must define lags"
-
-        if num_covariates > 0:
-            assert (
-                "lags_future_covariates" in lags_dict.keys()
-            ), "Must define lags_future_covariates"
-            if type(lags_dict["lags_future_covariates"]) == list:
-                assert (
-                    len(lags_dict["lags_future_covariates"]) == num_covariates
-                ), "lags_future_covariates as list must be same length as number of covariates"
-                assert all(
-                    type(i) == int for i in lags_dict["lags_future_covariates"]
-                ), "lags_future_covariates should be list of ints"
-            else:
-                assert (
-                    type(lags_dict["lags_future_covariates"]) == tuple
-                ), "If not using list of integers, lags_future_covariates should be a tuple"
 
     def __init__(
         self,
@@ -154,3 +154,46 @@ class DartsLGBMModel(DartsModel):
         fc["value_max"] = fc["value_mean"] + fc["delta_max"]
         fc["value_min"] = fc["value_mean"] - fc["delta_min"]
         return fc.reset_index()[["time", "value_max", "value_min", "value_mean"]]
+
+
+class DeltaLGBMModel(DartsModel):
+    """Class for fitting delta max or min with LightGBM model
+
+    Parameters
+    ----------
+    target: str, one of ["max", "min"]
+        target to be fitting
+
+    covariates: list
+        List of covariate names to use in model
+
+    lags: dict
+        Dictionary of lags arguments for defining the LightGBM model
+    """
+
+    def __init__(self, target: str, covariates: list = [], lags: dict = {"lags": None}):
+        assert target in ["max", "min"], "target must be max or min"
+        self.target = f"delta_{target}"
+        self._check_lags_dict(lags, num_covariates=len(covariates))
+        self.covariates = covariates
+        self.model = LightGBMModel(**lags)
+        self.uses_lags = any([d is not None for d in lags.values()])
+
+    def fit(self, train: pd.DataFrame, check_train=True):
+        if check_train:
+            self._check_train_data(train)
+
+        target_ts = self._convert_to_ts(train, self.target)
+        if self.covariates:
+            covariates_ts = self._convert_to_ts(train, self.covariates)
+            self.model.fit(target_ts, future_covariates=covariates_ts)
+        else:
+            self.model.fit(target_ts)
+
+    def predict(self, n: int, future_covariates_df: pd.DataFrame):
+        if self.covariates:
+            covariates_ts = self._convert_to_ts(future_covariates_df, self.covariates)
+            preds = self.model.predict(n=n, future_covariates=covariates_ts)
+        else:
+            preds = self.model.predict(n=n)
+        return preds.pd_dataframe()

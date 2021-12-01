@@ -1,4 +1,5 @@
 #%% packages
+from audioop import cross
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -10,11 +11,14 @@ from hrpe.features.time import make_datetime_features
 from hrpe.models.selection import MonthSeriesSplit
 from hrpe.models.eval import score_model
 
-from hrpe.models.darts import DartsLGBMModel
+from hrpe.models.darts import DartsLGBMModel, DeltaLGBMModel
+
+from itertools import chain, combinations
 
 # Fuck it just try lightgbm?
 from darts import TimeSeries
 from darts.models import LightGBMModel
+from darts.metrics import mse
 
 #%% Load data
 SUBSTATION = "staplegrove"
@@ -37,29 +41,119 @@ demand_data = make_datetime_features(demand_data)
 data = pd.merge(demand_data, weather_data, on="time")
 
 # %% create test-train generator
+# These are default params but stating for transparency
+msplit = MonthSeriesSplit(n_splits=5, min_train_months=12)
+
+dmax_covariates = [
+    "value_mean",
+    "period",
+    "day_of_week",
+    "is_weekday",
+    "temperature",
+    "solar_irradiance",
+]
+
+dmax_model = DeltaLGBMModel(
+    target="max",
+    covariates=dmax_covariates,
+    lags={"lags": None, "lags_future_covariates": [0] * len(dmax_covariates)},
+)
+
+# %%
+
+all_scores = []
+for train, test in msplit.split(data):
+    test_start = test.time.min()
+    print(f"Fitting for {test_start}")
+    dmax_model.fit(train)
+    preds = dmax_model.predict(len(test), future_covariates_df=data).reset_index()
+    truths = test[["time", "delta_max"]]
+    mse_score = mse(
+        actual_series=TimeSeries.from_dataframe(truths, "time", "delta_max"),
+        pred_series=TimeSeries.from_dataframe(preds, "time", "delta_max"),
+    )
+    all_scores.append([test_start, mse_score])
+scores = pd.DataFrame(all_scores)
+scores.columns = ["test_start", "mse"]
+print(scores)
+
+# %% Compare with one random covariate
+dmax_covariates = ["period"]
+dmax_model = DeltaLGBMModel(
+    target="max",
+    covariates=dmax_covariates,
+    lags={"lags": None, "lags_future_covariates": [0] * len(dmax_covariates)},
+)
+
+all_scores = []
+for train, test in msplit.split(data):
+    test_start = test.time.min()
+    print(f"Fitting for {test_start}")
+    dmax_model.fit(train)
+    preds = dmax_model.predict(len(test), future_covariates_df=data).reset_index()
+    truths = test[["time", "delta_max"]]
+    mse_score = mse(
+        actual_series=TimeSeries.from_dataframe(truths, "time", "delta_max"),
+        pred_series=TimeSeries.from_dataframe(preds, "time", "delta_max"),
+    )
+    all_scores.append([test_start, mse_score])
+scores = pd.DataFrame(all_scores)
+scores.columns = ["test_start", "mse"]
+print(scores)
+
+# %% Now functionalise some shit
+def cross_validate(model, split, data, target, verbose=False):
+    scores = []
+    for train, test in split.split(data):
+        test_start = test.time.min()
+        if verbose:
+            print(f"Fitting for data up to {test_start}")
+        model.fit(train)
+        preds = model.predict(len(test), future_covariates_df=data).reset_index()
+        truths = test[["time", target]]
+        mse_score = mse(
+            actual_series=TimeSeries.from_dataframe(truths, "time", target),
+            pred_series=TimeSeries.from_dataframe(preds, "time", target),
+        )
+        scores.append([test_start, mse_score])
+    scores = pd.DataFrame(scores, columns=["test_start", "mse"])
+    return scores
 
 
-def month_series_split(data: pd.DataFrame, n_splits=5, min_train_months=12):
-    """
-    Generate test and train splits for cross-validation by month.
-    For each split, the test set is 1 month of data.
-    Splits are moved backward one month at a time.
+dmax_covariates = ["value_mean"]
+dmax_model = DeltaLGBMModel(
+    target="max",
+    covariates=dmax_covariates,
+    lags={"lags": None, "lags_future_covariates": [0] * len(dmax_covariates)},
+)
+cv_scores = cross_validate(dmax_model, msplit, data, "delta_max", verbose=True)
+print(cv_scores)
+# %% Now test various combinations
+def powerset(iterable):
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1))
 
 
-    Parameters
-    ----------
-    data: pd.DataFrame
-        Data to be split
+dmax_covariates = [
+    "value_mean",
+    "period",
+    "day_of_week",
+    "is_weekday",
+    "temperature",
+    "solar_irradiance",
+]
 
-    n_splits: int, defualt=5
-        Number of splits
-
-    min_train_months: int, default=12
-        Minimum number of months in training set
-
-
-
-    """
-    assert "time" in data.columns, "data must contain 'time' column."
-
-    # Make sure there's enough months in data to do all splits
+all_scores = []
+for cov_list in powerset(dmax_covariates):
+    cov_list = list(cov_list)
+    dmax_model = DeltaLGBMModel(
+        target="max",
+        covariates=cov_list,
+        lags={"lags": None, "lags_future_covariates": [0] * len(cov_list)},
+    )
+    cv_scores = cross_validate(dmax_model, msplit, data, "delta_max", verbose=True)
+    cv_scores["covariates"] = ", ".join(cov_list)
+    all_scores.append(cv_scores)
+all_scores = pd.concat(all_scores)
+print(all_scores)
+# %%
