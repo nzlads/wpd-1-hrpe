@@ -36,38 +36,8 @@ demand_data = pd.merge(maxmin_data, hh_data, on="time").rename(
 demand_data = calculate_deltas(demand_data)
 demand_data = make_datetime_features(demand_data)
 data = pd.merge(demand_data, weather_data, on="time")
-msplit = MonthSeriesSplit(n_splits=5, min_train_months=12)
+msplit = MonthSeriesSplit(n_splits=8, min_train_months=12)
 
-# %% Define cross validate function
-def fit_and_score_delta(train, test, model, target, verbose=True):
-    test_start = test.time.min()
-    if verbose:
-        print(f"Fitting for data up to {test_start}")
-    model.fit(train)
-    preds = model.predict(len(test), future_covariates_df=data).reset_index()
-    truths = test[["time", target]]
-    mse_score = mse(
-        actual_series=TimeSeries.from_dataframe(truths, "time", target),
-        pred_series=TimeSeries.from_dataframe(preds, "time", target),
-    )
-    return [test_start, mse_score]
-
-
-n_jobs = cpu_count() - 2
-print(n_jobs)
-
-best_covariates = ["value_mean", "period", "temperature", "solar_irradiance"]
-dmax_model = DeltaLGBMModel(
-    target="max",
-    covariates=best_covariates,
-    lags={"lags": None, "lags_future_covariates": [0] * len(best_covariates)},
-)
-
-parallel = Parallel(n_jobs=n_jobs, verbose=True)
-scores = parallel(
-    delayed(fit_and_score_delta)(train, test, dmax_model, "delta_max")
-    for train, test in msplit.split(data)
-)
 # %% Again but for full combo for min
 all_covariates = [
     "value_mean",
@@ -115,10 +85,15 @@ def gen_combos(data, split, covs):
 
 
 n_jobs = cpu_count() - 1
-parallel = Parallel(n_jobs=n_jobs, verbose=True)
+parallel = Parallel(n_jobs=n_jobs, verbose=3)
 min_scores = parallel(
     delayed(fit_score_delta_model)(train, test, covs, data, "min")
     for train, test, covs in gen_combos(data, msplit, all_covariates)
 )
-
-# %%
+min_scores = (
+    pd.DataFrame(min_scores, columns=["covariates", "test_start", "mse"])
+    .groupby("covariates")
+    .agg({"mse": "mean"})
+    .reset_index()
+)
+min_scores.to_csv("data/processed/min_cv_scores.csv", index=False)
