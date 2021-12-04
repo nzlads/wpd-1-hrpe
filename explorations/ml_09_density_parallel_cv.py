@@ -95,5 +95,20 @@ min_scores = (
     .groupby("covariates")
     .agg({"mse": "mean"})
     .reset_index()
+    .sort_values('mse')
 )
 min_scores.to_csv("data/processed/min_cv_scores.csv", index=False)
+
+# %% Repeat for max
+max_scores = parallel(
+    delayed(fit_score_delta_model)(train, test, covs, data, "max")
+    for train, test, covs in gen_combos(data, msplit, all_covariates)
+)
+max_scores = (
+    pd.DataFrame(max_scores, columns=["covariates", "test_start", "mse"])
+    .groupby("covariates")
+    .agg({"mse": "mean"})
+    .reset_index()
+    .sort_values('mse')
+)
+max_scores.to_csv("data/processed/max_cv_scores.csv", index=False)
