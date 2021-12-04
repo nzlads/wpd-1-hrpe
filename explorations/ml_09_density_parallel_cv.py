@@ -112,3 +112,34 @@ max_scores = (
     .sort_values('mse')
 )
 max_scores.to_csv("data/processed/max_cv_scores.csv", index=False)
+
+# %% Use best covariates for each of max and min
+best_max_covariates = [
+    "value_mean", "period", "month_of_year", "temperature"
+]
+best_min_covariates = [
+    "value_mean", "period", "month_of_year", "temperature", "solar_irradiance", "windspeed_east", "spec_humidity"
+]
+
+lgbm = DartsLGBMModel(
+    dmax_covariates=best_max_covariates,
+    dmin_covariates=best_min_covariates,
+    dmax_lags={"lags": None, "lags_future_covariates": [0] * len(best_max_covariates)},
+    dmin_lags={"lags": None, "lags_future_covariates": [0] * len(best_min_covariates)},
+)
+
+skill_scores = []
+for train, test in msplit.split(data):
+    test_start = test.time.min()
+    lgbm.fit(train)
+    custom_preds = lgbm.predict(
+        forecast=test[["time", "value_mean"]], future_covariates_df=test
+    )
+    truths = test[["time", "value_max", "value_min", "value_mean"]].reset_index(
+        drop=True
+    )
+    skill_score = score_model(custom_preds, truths)
+    skill_scores.append([test_start, skill_score])
+
+skill_scores = pd.DataFrame(skill_scores, columns=["test_start", "skill_score"])
+skill_scores
