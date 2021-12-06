@@ -98,64 +98,6 @@ class DartsModel:
         return fc.reset_index()[["time", "value_max", "value_min", "value_mean"]]
 
 
-class DartsLGBMModel(DartsModel):
-    """
-    Class implementing LGBM model for dmax and dmin
-    """
-
-    def __init__(
-        self,
-        dmax_covariates: list = [],
-        dmin_covariates: list = [],
-        dmax_lags: dict = {"lags": None},
-        dmin_lags: dict = {"lags": None},
-    ):
-        self._check_lags_dict(dmax_lags, num_covariates=len(dmax_covariates))
-        self._check_lags_dict(dmin_lags, num_covariates=len(dmin_covariates))
-
-        self.dmax_model = LightGBMModel(**dmax_lags)
-        self.dmin_model = LightGBMModel(**dmin_lags)
-
-        self.dmax_uses_lags = any([d is not None for d in dmax_lags.values()])
-        self.dmin_uses_lags = any([d is not None for d in dmin_lags.values()])
-
-        self.dmax_covariates = dmax_covariates
-        self.dmin_covariates = dmin_covariates
-
-    def fit(self, train: pd.DataFrame):
-        self._check_train_data(train)
-
-        # Convert train data to time series for the model fitting
-        dmax_ts = self._convert_to_ts(train, "delta_max")
-        dmin_ts = self._convert_to_ts(train, "delta_min")
-
-        dmax_cov = self._convert_to_ts(train, self.dmax_covariates)
-        dmin_cov = self._convert_to_ts(train, self.dmin_covariates)
-
-        self.dmax_model.fit(dmax_ts, future_covariates=dmax_cov)
-        self.dmin_model.fit(dmin_ts, future_covariates=dmin_cov)
-
-    def predict(self, forecast: pd.DataFrame, future_covariates_df: pd.DataFrame):
-        dmax_cov = self._convert_to_ts(future_covariates_df, self.dmax_covariates)
-        dmin_cov = self._convert_to_ts(future_covariates_df, self.dmin_covariates)
-
-        fc = forecast.copy().set_index("time")
-        fc_horizon = len(forecast)
-
-        preds = pd.DataFrame.join(
-            self.dmax_model.predict(
-                n=fc_horizon, future_covariates=dmax_cov
-            ).pd_dataframe(),
-            self.dmin_model.predict(
-                n=fc_horizon, future_covariates=dmin_cov
-            ).pd_dataframe(),
-        )
-        fc = fc.join(preds)
-        fc["value_max"] = fc["value_mean"] + fc["delta_max"]
-        fc["value_min"] = fc["value_mean"] - fc["delta_min"]
-        return fc.reset_index()[["time", "value_max", "value_min", "value_mean"]]
-
-
 class DeltaLGBMModel(DartsModel):
     """Class for fitting delta max or min with LightGBM model
 
@@ -197,3 +139,37 @@ class DeltaLGBMModel(DartsModel):
         else:
             preds = self.model.predict(n=n)
         return preds.pd_dataframe()
+
+
+class DartsLGBMModel(DartsModel):
+    def __init__(
+        self,
+        dmax_covariates: list = [],
+        dmin_covariates: list = [],
+        dmax_lags: dict = {"lags": None},
+        dmin_lags: dict = {"lags": None},
+    ):
+        self.dmax_model = DeltaLGBMModel("max", dmax_covariates, dmax_lags)
+        self.dmin_model = DeltaLGBMModel("min", dmin_covariates, dmin_lags)
+
+    def fit(self, train: pd.DataFrame):
+        self._check_train_data(train)
+
+        self.dmax_model.fit(train, check_train=False)
+        self.dmin_model.fit(train, check_train=False)
+
+    def predict(self, forecast: pd.DataFrame, future_covariates_df: pd.DataFrame):
+        fc = forecast.copy().set_index("time")
+        fc_horizon = len(forecast)
+        preds = pd.DataFrame.join(
+            self.dmax_model.predict(
+                n=fc_horizon, future_covariates_df=future_covariates_df
+            ),
+            self.dmin_model.predict(
+                n=fc_horizon, future_covariates_df=future_covariates_df
+            ),
+        )
+        fc = fc.join(preds)
+        fc["value_max"] = fc["value_mean"] + fc["delta_max"]
+        fc["value_min"] = fc["value_mean"] - fc["delta_min"]
+        return fc.reset_index()[["time", "value_max", "value_min", "value_mean"]]
