@@ -113,12 +113,18 @@ class DeltaLGBMModel(DartsModel):
         Dictionary of lags arguments for defining the LightGBM model
     """
 
-    def __init__(self, target: str, covariates: list = [], lags: dict = {"lags": None}):
+    def __init__(
+        self,
+        target: str,
+        covariates: list = [],
+        lags: dict = {"lags": None},
+        user_kwargs: dict = dict(),
+    ):
         assert target in ["max", "min"], "target must be max or min"
         self.target = f"delta_{target}"
         self._check_lags_dict(lags, num_covariates=len(covariates))
         self.covariates = covariates
-        self.model = LightGBMModel(**lags)
+        self.model = LightGBMModel(**lags, **user_kwargs)
         self.uses_lags = any([d is not None for d in lags.values()])
 
     def fit(self, train: pd.DataFrame, check_train=True):
@@ -148,9 +154,11 @@ class DartsLGBMModel(DartsModel):
         dmin_covariates: list = [],
         dmax_lags: dict = {"lags": None},
         dmin_lags: dict = {"lags": None},
+        dmax_kwargs: dict = dict(),
+        dmin_kwargs: dict = dict(),
     ):
-        self.dmax_model = DeltaLGBMModel("max", dmax_covariates, dmax_lags)
-        self.dmin_model = DeltaLGBMModel("min", dmin_covariates, dmin_lags)
+        self.dmax_model = DeltaLGBMModel("max", dmax_covariates, dmax_lags, dmax_kwargs)
+        self.dmin_model = DeltaLGBMModel("min", dmin_covariates, dmin_lags, dmin_kwargs)
 
     def fit(self, train: pd.DataFrame):
         self._check_train_data(train)
