@@ -55,9 +55,10 @@ def _validate_submissions_data(data, month, year):
 
     # Filter by time
     data = filter_data_by_time(data, time_start, time_end)
-    assert (
-        data.shape[0] == ndays * 48
-    ), f"The data must have the same number of rows as the number of days in the mont *48, instead it has {data.shape[0]}"
+    if month is not "september":
+        assert (
+            data.shape[0] == ndays * 48
+        ), f"The data must have the same number of rows as the number of days in the mont *48, instead it has {data.shape[0]}"
 
     return data
 
