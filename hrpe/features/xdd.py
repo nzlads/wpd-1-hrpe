@@ -45,7 +45,10 @@ def cdd(data: pd.DataFrame, cutoff: float, temp_col="temperature") -> pd.DataFra
 
 
 def xdd(
-    data: pd.DataFrame, h_cutoff: float, c_cutoff: float, temp_col="temperature"
+    data: pd.DataFrame,
+    h_cutoff: float = 15,
+    c_cutoff: float = 5,
+    temp_col="temperature",
 ) -> pd.DataFrame:
     """
     Calculates the XDDs (X degree day) of a dataset.
