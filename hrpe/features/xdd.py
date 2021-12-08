@@ -2,9 +2,6 @@ import pandas as pd
 
 from hrpe.features.weather import add_weather
 
-data = add_weather(hh_data, weather_data)
-xdd(data, 13, 12)
-
 
 def hdd(data: pd.DataFrame, cutoff: float, temp_col="temperature") -> pd.DataFrame:
     """
