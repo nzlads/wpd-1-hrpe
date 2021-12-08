@@ -1,4 +1,0 @@
-hrpe/data/raw/geevor/*.csv filter=lfs diff=lfs merge=lfs -text
-hrpe/data/raw/mousehole/*.csv filter=lfs diff=lfs merge=lfs -text
-hrpe/data/raw/staplegrove/*.csv filter=lfs diff=lfs merge=lfs -text
-*.csv filter=lfs diff=lfs merge=lfs -text
