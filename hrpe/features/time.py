@@ -44,9 +44,12 @@ def day_of_year(row):
     Used as an apply function.
     """
 
-    df[dayofyear]
-    df[year]
-    df[leapyear] = 0 / 1
+    # Edit d
+
+    # df[dayofyear]
+    # df[year]
+    # df[leapyear]=0/1
+
     # Check leap year
     if row["time"].dt.is_leap_year:
         # 29th Feb is 59.5
