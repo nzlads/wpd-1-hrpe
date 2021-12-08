@@ -47,3 +47,18 @@ def add_weather(data, weather):
     return Data with weather features
     return vector of strings of which features were added i.e. ['solar', 'wind', etc]
     """
+    pass
+
+
+def use_all_stations(data: pd.DataFrame):
+    """
+    Use all the weather values from the stations
+    """
+    assert "station" in data.columns, "Need the station value"
+
+    station_dfs = []
+    for station, df in data.groupby("station"):
+        station_df = df.set_index("time").drop(columns="station")
+        station_df.columns = [f"{col}_{station}" for col in station_df.columns]
+        station_dfs.append(station_df)
+    return pd.concat(station_dfs, axis=1).reset_index()
