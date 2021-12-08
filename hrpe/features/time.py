@@ -26,7 +26,7 @@ def make_datetime_features(data: pd.DataFrame):
     df["is_weekday"] = df["time"].dt.dayofweek < 5
     # Create the period timestamp
     df["period_time"] = data["time"].dt.floor("30T")
-    df["day_of_year"] = df.apply(lambda x: day_of_year(x), axis=1)
+    df["day_of_year"] = day_of_year(df)
     df["hh_of_week"] = hh_of_week(df)
 
     # df["hh_of_week"] = df.apply(lambda x: hh_of_week(x),axis=1)
@@ -35,33 +35,55 @@ def make_datetime_features(data: pd.DataFrame):
     return df
 
 
-def day_of_year(row):
+def day_of_year(df) -> pd.Series:
     """
     Maps each data row such that 1st Jan = 1, 2nd Jan = 2 ...
     Adjusts yday values for leap years. 29 February is now assigned 59.5 and
     following dates are assigned their original yday minus 1.
     This ensures yday values are consistent with dates across all years.
-    Used as an apply function.
     """
+    REQUIRES = ["time"]
 
-    # Edit d
+    df["day_of_year"] = df["time"].dt.dayofyear
+    # Get leap years vector.
+    df["leap_year"] = df["time"].dt.is_leap_year
 
-    # df[dayofyear]
-    # df[year]
-    # df[leapyear]=0/1
+    # For those days with leap years, have loc statements.
+    df.loc[df["leap_year"] & df["day_of_year"] == 60, "day_of_year"] = 59.5
+    df.loc[df["leap_year"] & df["day_of_year"] > 60, "day_of_year"] = (
+        df["day_of_year"] - 1
+    )
 
-    # Check leap year
-    if row["time"].dt.is_leap_year:
-        # 29th Feb is 59.5
-        if row["time"].dt.dayofyear == 60:
-            return 59.5
-        if row["time"].dt.dayofyear > 60:
-            return row["time"].dt.dayofyear - 1
-        else:
-            return row["time"].dt.dayofyear
+    return df["day_of_year"]
 
-    else:
-        return row["time"].dt.dayofyear
+
+# def day_of_year(row):
+#     """
+#     Maps each data row such that 1st Jan = 1, 2nd Jan = 2 ...
+#     Adjusts yday values for leap years. 29 February is now assigned 59.5 and
+#     following dates are assigned their original yday minus 1.
+#     This ensures yday values are consistent with dates across all years.
+#     Used as an apply function.
+#     """
+
+#     # Edit d
+
+#     # df[dayofyear]
+#     # df[year]
+#     # df[leapyear]=0/1
+
+#     # Check leap year
+#     if row["time"].dt.is_leap_year:
+#         # 29th Feb is 59.5
+#         if row["time"].dt.dayofyear == 60:
+#             return 59.5
+#         if row["time"].dt.dayofyear > 60:
+#             return row["time"].dt.dayofyear - 1
+#         else:
+#             return row["time"].dt.dayofyear
+
+#     else:
+#         return row["time"].dt.dayofyear
 
 
 def hh_of_week(df) -> pd.Series:
