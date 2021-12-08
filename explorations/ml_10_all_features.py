@@ -1,4 +1,5 @@
 # %% packages
+import numpy as np
 import pandas as pd
 
 from hrpe.data.load import load_hh_data, load_maxmin_data, load_weather_data
@@ -25,7 +26,7 @@ hh_data = load_hh_data(SUBSTATION)
 maxmin_data = load_maxmin_data(SUBSTATION)
 weather_data = load_weather_data(SUBSTATION)
 weather_data = interpolate_weather(weather_data)
-weather_data = xdd(weather_data)
+# weather_data = xdd(weather_data)
 # Add all weather features
 weather_data = use_all_stations(weather_data)
 
@@ -65,12 +66,23 @@ def fit_and_score(train, test, model, data):
     return [test_start, skill_score]
 
 
+lags = np.array([47, 48, 49, 48 * 7 - 1, 48 * 7, 48 * 7 + 1]) * -1
+lags_future_covariates = np.concatenate([np.arange(1, 49), np.array([96, 48 * 7])]) * -1
+
 n_jobs = cpu_count() - 1
 model = DartsLGBMModel(
     dmax_covariates=all_covariates,
     dmin_covariates=all_covariates,
-    dmax_lags={"lags": None, "lags_future_covariates": [0] * len(all_covariates)},
-    dmin_lags={"lags": None, "lags_future_covariates": [0] * len(all_covariates)},
+    dmax_lags={
+        "lags": lags.tolist(),
+        "lags_future_covariates": lags_future_covariates.tolist(),
+    },
+    dmin_lags={
+        "lags": lags.tolist(),
+        "lags_future_covariates": lags_future_covariates.tolist(),
+    },
+    dmax_kwargs={"n_estimators": 300},
+    dmin_kwargs={"n_estimators": 300},
 )
 parallel = Parallel(n_jobs=n_jobs, verbose=9)
 # %%
@@ -78,5 +90,6 @@ scores = parallel(
     delayed(fit_and_score)(train, test, model, data)
     for train, test in msplit.split(data)
 )
+pd.DataFrame(scores, columns=["test_start", "skill_score"])
 
 # %%

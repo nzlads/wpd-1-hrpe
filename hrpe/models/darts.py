@@ -60,9 +60,6 @@ class DartsModel:
                 "lags_future_covariates" in lags_dict.keys()
             ), "Must define lags_future_covariates"
             if type(lags_dict["lags_future_covariates"]) == list:
-                assert (
-                    len(lags_dict["lags_future_covariates"]) == num_covariates
-                ), "lags_future_covariates as list must be same length as number of covariates"
                 assert all(
                     type(i) == int for i in lags_dict["lags_future_covariates"]
                 ), "lags_future_covariates should be list of ints"

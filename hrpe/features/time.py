@@ -51,7 +51,7 @@ def day_of_year(df) -> pd.Series:
     # For those days with leap years, have loc statements.
     df.loc[df["leap_year"] & df["day_of_year"] == 60, "day_of_year"] = 59.5
 
-    days_after_leap_year = df.loc[df["leap_year"] & df["day_of_year"] > 60]
+    days_after_leap_year = df["leap_year"] & df["day_of_year"] > 60
     df.loc[days_after_leap_year, "day_of_year"] = (
         df.loc[days_after_leap_year, "day_of_year"] - 1
     )
