@@ -75,7 +75,16 @@ model_combos = [
     #     "dmin_model": AutoARIMA(m=48, trace=True)
     # },
     # FFT
-    {"dmax_model": FFT(), "dmin_model": FFT()},
+    {"dmax_model": FFT(nr_freqs_to_keep=1), "dmin_model": FFT(nr_freqs_to_keep=1)},
+    {"dmax_model": FFT(nr_freqs_to_keep=2), "dmin_model": FFT(nr_freqs_to_keep=2)},
+    {"dmax_model": FFT(nr_freqs_to_keep=3), "dmin_model": FFT(nr_freqs_to_keep=3)},
+    {"dmax_model": FFT(nr_freqs_to_keep=4), "dmin_model": FFT(nr_freqs_to_keep=4)},
+    {"dmax_model": FFT(nr_freqs_to_keep=5), "dmin_model": FFT(nr_freqs_to_keep=5)},
+    {"dmax_model": FFT(nr_freqs_to_keep=6), "dmin_model": FFT(nr_freqs_to_keep=6)},
+    {"dmax_model": FFT(nr_freqs_to_keep=7), "dmin_model": FFT(nr_freqs_to_keep=7)},
+    {"dmax_model": FFT(nr_freqs_to_keep=8), "dmin_model": FFT(nr_freqs_to_keep=8)},
+    {"dmax_model": FFT(nr_freqs_to_keep=10), "dmin_model": FFT(nr_freqs_to_keep=10)},
+    # FFT 5 had the min score
 ]
 
 #%%
