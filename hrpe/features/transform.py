@@ -27,3 +27,18 @@ def minute_data_to_hh_data(data: pd.DataFrame):
     hh_data.reset_index(drop=True, inplace=True)
 
     return hh_data
+
+
+def add_lags(data: pd.DataFrame, lags: dict):
+    assert set(lags.keys()).issubset(
+        data.columns
+    ), "the lags should refer to the columns in data"
+    assert all(
+        [type(lag_list) == list for lag_list in lags.values()]
+    ), "expect list for all lag entries"
+
+    df = data.copy()
+    for key, ls in lags.items():
+        for lag in ls:
+            df[f"{key}_{lag}"] = df[[key]].shift(lag)
+    return df.dropna()

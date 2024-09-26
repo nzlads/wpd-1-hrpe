@@ -47,3 +47,31 @@ def add_weather(data, weather):
     return Data with weather features
     return vector of strings of which features were added i.e. ['solar', 'wind', etc]
     """
+    return pd.merge(data, weather, on="time")
+
+
+def use_all_stations(data: pd.DataFrame):
+    """
+    Use all the weather values from the stations
+    """
+    assert "station" in data.columns, "Need the station value"
+
+    station_dfs = []
+    for station, df in data.groupby("station"):
+        station_df = df.set_index("time").drop(columns="station")
+        station_df.columns = [f"{col}_{station}" for col in station_df.columns]
+        station_dfs.append(station_df)
+    return pd.concat(station_dfs, axis=1).reset_index()
+
+
+def set_weather_vars(data: pd.DataFrame):
+    solar = data.query("station == '1'")[["time", "solar_irradiance"]]
+    rem = data.drop(columns="solar_irradiance").groupby("time").agg("mean")
+    return pd.merge(rem, solar, on="time")
+
+
+def prep_weather(data):
+    res = data.copy()
+    res = interpolate_weather(res)
+    res = set_weather_vars(res)
+    return res
